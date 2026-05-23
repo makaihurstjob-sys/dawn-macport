@@ -41,8 +41,8 @@ The exact final copy can still be refined once the owner approves wording, servi
 
 The old Supabase project is not accessible. The new project is:
 
-- Project ref: `ayjsgmdpzlsokfgyjhsl`
-- Project URL: `https://ayjsgmdpzlsokfgyjhsl.supabase.co`
+- Project ref: add the active Supabase project ref here
+- Project URL: add the active Supabase project URL here
 
 1. Create a new Supabase project in the account that will own the website.
 2. In Supabase SQL Editor, run:

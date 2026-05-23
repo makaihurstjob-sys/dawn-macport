@@ -7,9 +7,7 @@ Official reference: https://docs.netlify.com/frameworks/tanstack-start/
 ## Current Status
 
 - Local project builds successfully with the current TanStack/Lovable/Cloudflare-oriented setup.
-- Local environment is connected to the new Supabase project:
-  - Project ref: `ayjsgmdpzlsokfgyjhsl`
-  - Project URL: `https://ayjsgmdpzlsokfgyjhsl.supabase.co`
+- Local environment can be connected to the active Supabase project through environment variables.
 - This local machine does not currently expose `npm`, `npx`, `bun`, `pnpm`, `yarn`, or the `netlify` CLI in the shell path.
 - Netlify deployment is not finalized until the Netlify adapter package is installed and the site is connected to a Netlify project.
 
