@@ -9,19 +9,19 @@ Official reference: https://docs.netlify.com/frameworks/tanstack-start/
 - Local project builds successfully with the current TanStack/Lovable/Cloudflare-oriented setup.
 - Local environment can be connected to the active Supabase project through environment variables.
 - This local machine does not currently expose `npm`, `npx`, `bun`, `pnpm`, `yarn`, or the `netlify` CLI in the shell path.
-- Netlify deployment is not finalized until the Netlify adapter package is installed and the site is connected to a Netlify project.
+- Netlify deployment uses `@netlify/vite-plugin-tanstack-start` and `netlify.toml`.
 
 ## Required Before Netlify Deploy
 
 1. Connect this repo/project to Netlify.
-2. Install Netlify's TanStack Start adapter in the production repo:
+2. Confirm Netlify's TanStack Start adapter is installed in the production repo:
 
 ```sh
 npm install -D @netlify/vite-plugin-tanstack-start
 ```
 
-3. Update `vite.config.ts` to include the Netlify adapter per the current Netlify TanStack Start docs.
-4. Add `netlify.toml` after the adapter is installed:
+3. Confirm `vite.config.ts` includes the Netlify adapter per the current Netlify TanStack Start docs.
+4. Confirm `netlify.toml` exists:
 
 ```toml
 [build]
@@ -105,7 +105,6 @@ The booking page will show the live scheduler once a valid Cal.com URL is saved 
 
 ## Known Launch Blockers
 
-- Netlify adapter package is not installed yet.
 - Netlify site/project link is not connected in this local workspace yet.
 - Final Cal.com URL is pending unless the owner has already created it.
 - Client portrait, testimonials, service prices, and final contact details still need owner approval.
