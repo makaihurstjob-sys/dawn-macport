@@ -354,21 +354,25 @@ function About() {
 function Approach() {
   const steps = [
     {
+      letter: "D",
       icon: Compass,
       title: "Discover",
       text: "We name what is true: your season, your pressure points, your gifts, and the identity you are rebuilding.",
     },
     {
+      letter: "A",
       icon: Sprout,
       title: "Align",
       text: "We connect your faith, values, purpose, and priorities so your next steps stop feeling scattered.",
     },
     {
+      letter: "W",
       icon: Sunrise,
       title: "Walk",
       text: "We build simple rhythms, reflection practices, and action plans that can hold up in real life.",
     },
     {
+      letter: "N",
       icon: Map,
       title: "Navigate",
       text: "We keep refining the path with accountability, clarity worksheets, and strategic execution support.",
@@ -395,7 +399,7 @@ function Approach() {
           viewport={{ once: true, margin: "-100px" }}
           className="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
         >
-          {steps.map((step, index) => {
+          {steps.map((step) => {
             const Icon = step.icon;
             return (
               <motion.article
@@ -403,8 +407,8 @@ function Approach() {
                 variants={reveal}
                 className="relative min-h-[340px] overflow-hidden rounded-2xl border border-primary/15 bg-background p-7 shadow-[0_30px_80px_-55px_rgba(75,50,35,0.65)]"
               >
-                <div className="absolute right-6 top-4 font-serif text-8xl text-primary/8">
-                  0{index + 1}
+                <div className="absolute right-6 top-4 font-serif text-8xl uppercase text-primary/8">
+                  {step.letter}
                 </div>
                 <div className="relative z-10 mb-12 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
                   <Icon className="h-7 w-7" />
