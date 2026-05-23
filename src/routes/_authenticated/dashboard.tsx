@@ -196,9 +196,20 @@ function DashboardPage() {
   const deleteBooking = async (id: string) => {
     if (!window.confirm("Delete this booking quiz entry?")) return;
 
-    const { error } = await supabase.from("booking_qualifications").delete().eq("id", id);
+    setDashboardError("");
+
+    const { data: deleted, error } = await supabase.rpc("delete_booking_qualification", {
+      _id: id,
+    });
     if (error) {
       setDashboardError(error.message);
+      return;
+    }
+
+    if (!deleted) {
+      setDashboardError(
+        "Supabase did not delete this booking entry. Run the latest dashboard delete migration, then try again.",
+      );
       return;
     }
 
@@ -208,9 +219,20 @@ function DashboardPage() {
   const deleteNote = async (id: string) => {
     if (!window.confirm("Delete this dashboard note?")) return;
 
-    const { error } = await supabase.from("dashboard_notes").delete().eq("id", id);
+    setDashboardError("");
+
+    const { data: deleted, error } = await supabase.rpc("delete_dashboard_note", {
+      _id: id,
+    });
     if (error) {
       setDashboardError(error.message);
+      return;
+    }
+
+    if (!deleted) {
+      setDashboardError(
+        "Supabase did not delete this note. Run the latest dashboard delete migration, then try again.",
+      );
       return;
     }
 

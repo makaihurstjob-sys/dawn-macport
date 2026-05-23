@@ -49,6 +49,7 @@ The old Supabase project is not accessible. The new project is:
    - `supabase/migrations/20260512235202_ab38c8ef-2538-46ef-a4f3-7feaabab0472.sql`
    - `supabase/migrations/20260512235236_add1a852-aab7-4e62-a39d-4c2d7f667605.sql`
    - `supabase/migrations/20260523053000_booking_name_settings_delete.sql`
+   - `supabase/migrations/20260523143500_delete_dashboard_entries_rpc.sql`
 3. In Supabase Auth, create the admin user.
 4. In Supabase Auth, create the developer user.
 5. In SQL Editor, assign roles:

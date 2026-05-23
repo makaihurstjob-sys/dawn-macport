@@ -47,6 +47,7 @@ Run these migrations in Supabase SQL Editor, in this order:
 1. `supabase/migrations/20260512235202_ab38c8ef-2538-46ef-a4f3-7feaabab0472.sql`
 2. `supabase/migrations/20260512235236_add1a852-aab7-4e62-a39d-4c2d7f667605.sql`
 3. `supabase/migrations/20260523053000_booking_name_settings_delete.sql`
+4. `supabase/migrations/20260523143500_delete_dashboard_entries_rpc.sql`
 
 Then create auth users and assign roles:
 

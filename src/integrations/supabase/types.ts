@@ -238,6 +238,14 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      delete_booking_qualification: {
+        Args: { _id: string };
+        Returns: boolean;
+      };
+      delete_dashboard_note: {
+        Args: { _id: string };
+        Returns: boolean;
+      };
       has_any_role: {
         Args: { _roles: Database["public"]["Enums"]["app_role"][] };
         Returns: boolean;
