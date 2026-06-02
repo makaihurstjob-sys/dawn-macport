@@ -42,8 +42,6 @@ function CustomerApp() {
       setLoading(true);
       setError("");
 
-      await supabase.rpc("accept_customer_course_invites");
-
       const { data, error: enrollmentError } = await supabase
         .from("customer_enrollments")
         .select("id,status,courses(id,title,slug,description)")

@@ -103,7 +103,7 @@ export const inviteCustomerToCourse = createServerFn({ method: "POST" })
     const { error: enrollmentError } = await supabaseAdmin.from("customer_enrollments").upsert({
       customer_id: userId,
       course_id: data.courseId,
-      status: "invited",
+      status: "active",
       updated_at: new Date().toISOString(),
     });
 

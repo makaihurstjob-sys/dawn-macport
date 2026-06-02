@@ -32,7 +32,6 @@ function CustomerLogin() {
 
       const { data: profile } = await supabase.from("profiles").select("role").single();
       if (profile?.role === "customer") {
-        await supabase.rpc("accept_customer_course_invites");
         await navigate({ to: redirectPath });
       }
     };
@@ -68,7 +67,6 @@ function CustomerLogin() {
       return;
     }
 
-    await supabase.rpc("accept_customer_course_invites");
     await navigate({ to: redirectPath });
   };
 

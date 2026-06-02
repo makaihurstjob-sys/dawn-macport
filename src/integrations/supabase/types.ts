@@ -455,10 +455,6 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      accept_customer_course_invites: {
-        Args: Record<PropertyKey, never>;
-        Returns: number;
-      };
       delete_booking_qualification: {
         Args: { _id: string };
         Returns: boolean;
