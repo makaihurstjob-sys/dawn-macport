@@ -17,7 +17,6 @@ import {
   UserRound,
 } from "lucide-react";
 import wordmarkDarkSrc from "@/assets/brand/wordmark-dark.png";
-import wordmarkLightSrc from "@/assets/brand/wordmark-light.png";
 import navMarkSrc from "@/assets/brand/nav-mark.png";
 import { siteConfig } from "@/config/site";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,18 +54,15 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
   return (
     <nav className="fixed left-0 right-0 top-0 z-50 border-b border-white/10 bg-[#241f2f]/48 text-white shadow-[0_20px_80px_-58px_rgba(0,0,0,0.9)] backdrop-blur-2xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:h-20">
-        <a href="#home" className="flex min-w-0 items-center gap-3 text-white sm:gap-4">
+        <a
+          href="#home"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white sm:h-12 sm:w-12 lg:h-14 lg:w-14"
+          aria-label={siteConfig.shortName}
+        >
           <img
             src={navMarkSrc}
-            alt=""
-            aria-hidden="true"
-            className="h-10 w-10 shrink-0 object-contain sm:h-12 sm:w-12 lg:h-14 lg:w-14"
-            draggable={false}
-          />
-          <img
-            src={wordmarkLightSrc}
             alt={siteConfig.shortName}
-            className="h-7 w-auto max-w-[7.5rem] object-contain sm:h-9 sm:max-w-[12.5rem] lg:max-w-[13.5rem]"
+            className="h-full w-full object-contain"
             draggable={false}
           />
         </a>
