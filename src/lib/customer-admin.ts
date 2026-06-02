@@ -12,9 +12,9 @@ type InviteCustomerInput = {
 
 function getPublicSiteUrl() {
   return (
+    process.env.VITE_PUBLIC_SITE_URL ||
     process.env.URL ||
     process.env.DEPLOY_PRIME_URL ||
-    process.env.VITE_PUBLIC_SITE_URL ||
     "https://app.anewdawncoaching.org"
   );
 }

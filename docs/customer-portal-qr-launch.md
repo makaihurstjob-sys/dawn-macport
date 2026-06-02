@@ -20,6 +20,8 @@ After GoDaddy finishes verification, connect DNS to Netlify:
 - Follow the exact DNS records Netlify gives you for the apex and subdomains.
 - Wait for Netlify HTTPS certificates to finish provisioning.
 
+If Netlify is managing DNS for the domain, add `app.anewdawncoaching.org` through the site's domain settings/custom domains area. Netlify may warn that a manual CNAME to `*.netlify.app` is unnecessary or conflicting because it can create the needed managed record automatically.
+
 ## Netlify Environment Variables
 
 Keep these in Netlify environment variables, not in public code:
