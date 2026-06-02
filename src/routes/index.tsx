@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { motion, useScroll, useSpring, useTransform, type Variants } from "framer-motion";
-import { type FormEvent, useRef, useState } from "react";
+import { type FormEvent, useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   BookOpenText,
   CheckCircle2,
   Compass,
   HeartHandshake,
+  Instagram,
   Mail,
   Map,
   MessageCircleHeart,
@@ -41,12 +42,12 @@ const stagger: Variants = {
   },
 };
 
-function Navbar() {
+function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
   const links = [
     { label: "Home", href: "#home" },
     { label: "About", href: "#about" },
     { label: "Coaching", href: "#coaching" },
-    { label: "Testimonials", href: "#testimonials" },
+    ...(showTestimonials ? [{ label: "Testimonials", href: "#testimonials" }] : []),
     { label: "Contact", href: "#contact" },
   ];
 
@@ -378,6 +379,33 @@ function Approach() {
       text: "We keep refining the path with accountability, clarity worksheets, and strategic execution support.",
     },
   ];
+  const fares = [
+    {
+      letter: "F",
+      title: "Faith",
+      text: "Start with spiritual grounding before rushing into decisions.",
+    },
+    {
+      letter: "A",
+      title: "Awareness",
+      text: "Name the patterns, fears, and desires shaping the current season.",
+    },
+    {
+      letter: "R",
+      title: "Renewal",
+      text: "Replace old narratives with truth, identity, and renewed perspective.",
+    },
+    {
+      letter: "E",
+      title: "Execution",
+      text: "Turn clarity into simple actions, rhythms, and follow-through.",
+    },
+    {
+      letter: "S",
+      title: "Stewardship",
+      text: "Keep tending the growth with accountability and reflection.",
+    },
+  ];
 
   return (
     <section id="coaching" className="relative overflow-hidden bg-[#fff7ed] py-24 sm:py-32">
@@ -419,6 +447,36 @@ function Approach() {
             );
           })}
         </motion.div>
+
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="mt-14 rounded-2xl border border-primary/15 bg-background/80 p-6 shadow-[0_26px_80px_-60px_rgba(75,50,35,0.65)] sm:p-8"
+        >
+          <motion.div variants={reveal} className="mx-auto max-w-3xl text-center">
+            <p className="brand-kicker mb-3">F.A.R.E.S. Method</p>
+            <h3 className="font-serif text-3xl text-foreground sm:text-4xl">
+              The inner rhythm beneath the Dawn Method.
+            </h3>
+          </motion.div>
+          <div className="mt-8 grid gap-3 md:grid-cols-5">
+            {fares.map((item) => (
+              <motion.div
+                key={item.title}
+                variants={reveal}
+                className="rounded-xl border border-border/60 bg-white/62 p-4"
+              >
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  {item.letter}
+                </div>
+                <h4 className="font-serif text-xl text-foreground">{item.title}</h4>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.text}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </section>
   );
@@ -428,22 +486,18 @@ function Services() {
   const services = [
     {
       title: "Free Discovery Call",
-      text: "A gentle first conversation to see what kind of support fits this season.",
       icon: MessageCircleHeart,
     },
     {
       title: "Purpose Clarity Session",
-      text: "Focused coaching for direction, calling, vision, or one important next step.",
       icon: Map,
     },
     {
       title: "Identity + Alignment Session",
-      text: "A deeper session for mindset renewal, identity development, and aligned action.",
       icon: HeartHandshake,
     },
     {
       title: "12-Week Transformation Program",
-      text: "Weekly coaching, clarity work, New Dawn mapping, and execution planning over time.",
       icon: BookOpenText,
     },
   ];
@@ -453,8 +507,8 @@ function Services() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <SectionIntro eyebrow="Services" title="Choose the support your next chapter needs.">
           <p>
-            Every offer is designed to feel personal, grounded, and practical, with space for faith,
-            strategy, and real-life follow-through.
+            Service names are listed here without public pricing. The right next step can be chosen
+            through the booking flow or a direct conversation.
           </p>
         </SectionIntro>
 
@@ -471,7 +525,6 @@ function Services() {
                   <Icon className="h-6 w-6" />
                 </div>
                 <h3 className="font-serif text-2xl text-foreground">{service.title}</h3>
-                <p className="mt-4 leading-7 text-muted-foreground">{service.text}</p>
                 <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-primary">
                   Book this option
                   <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
@@ -602,6 +655,15 @@ function Contact() {
               <Phone className="h-5 w-5 text-primary" />
               {siteConfig.contactPhone}
             </p>
+            <a
+              href={siteConfig.instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-3 transition hover:text-primary"
+            >
+              <Instagram className="h-5 w-5 text-primary" />
+              @anewdawn.coaching
+            </a>
           </motion.div>
         </motion.div>
 
@@ -681,6 +743,68 @@ function Contact() {
   );
 }
 
+function FloatingCoachChat() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, y: 18, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: 18, scale: 0.96 }}
+          className="w-[min(92vw,360px)] overflow-hidden rounded-2xl border border-border/70 bg-background shadow-[0_28px_100px_-52px_rgba(36,31,44,0.8)]"
+        >
+          <div className="bg-[#241f2f] p-5 text-white">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#f6cf8d]">
+              A'New Dawn assistant
+            </p>
+            <h3 className="mt-2 font-serif text-2xl text-[#fff8ea]">How can we help?</h3>
+          </div>
+          <div className="space-y-3 p-5">
+            <p className="rounded-xl bg-muted p-4 text-sm leading-6 text-muted-foreground">
+              Welcome. You can start with the booking quiz, send a message, or visit Instagram for
+              updates.
+            </p>
+            <a
+              href="/book"
+              className="flex items-center justify-between rounded-xl bg-foreground px-4 py-3 text-sm font-medium text-background transition hover:bg-primary"
+            >
+              Book a session
+              <ArrowRight className="h-4 w-4" />
+            </a>
+            <a
+              href="#contact"
+              onClick={() => setOpen(false)}
+              className="flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
+            >
+              Send a message
+              <Mail className="h-4 w-4" />
+            </a>
+            <a
+              href={siteConfig.instagramUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between rounded-xl border border-border bg-background px-4 py-3 text-sm font-medium text-foreground transition hover:bg-muted"
+            >
+              Instagram
+              <Instagram className="h-4 w-4" />
+            </a>
+          </div>
+        </motion.div>
+      )}
+      <button
+        type="button"
+        onClick={() => setOpen((current) => !current)}
+        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#241f2f] text-[#fff8ea] shadow-[0_22px_60px_-24px_rgba(36,31,44,0.85)] transition hover:-translate-y-0.5 hover:bg-primary"
+        aria-label={open ? "Close A'New Dawn assistant" : "Open A'New Dawn assistant"}
+      >
+        <MessageCircleHeart className="h-6 w-6" />
+      </button>
+    </div>
+  );
+}
+
 function Footer() {
   return (
     <footer className="border-t border-border/70 bg-[#fffaf1] py-10">
@@ -703,17 +827,34 @@ function Footer() {
 }
 
 function Index() {
+  const [showTestimonials, setShowTestimonials] = useState(false);
+
+  useEffect(() => {
+    const loadSettings = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "testimonials_enabled")
+        .maybeSingle();
+
+      setShowTestimonials(data?.value === "true");
+    };
+
+    void loadSettings();
+  }, []);
+
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/20">
-      <Navbar />
+      <Navbar showTestimonials={showTestimonials} />
       <DawnScene />
       <PainPoints />
       <About />
       <Approach />
       <Services />
-      <Testimonials />
+      {showTestimonials && <Testimonials />}
       <Contact />
       <Footer />
+      <FloatingCoachChat />
     </div>
   );
 }

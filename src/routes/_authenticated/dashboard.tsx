@@ -109,6 +109,7 @@ function DashboardPage() {
   const [qrLinks, setQrLinks] = useState<QrLink[]>([]);
   const [noteText, setNoteText] = useState("");
   const [calBookingUrl, setCalBookingUrl] = useState("");
+  const [testimonialsEnabled, setTestimonialsEnabled] = useState(false);
   const [settingsStatus, setSettingsStatus] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -204,6 +205,10 @@ function DashboardPage() {
           setSettings(settingsData || []);
           setCalBookingUrl(
             settingsData?.find((setting) => setting.key === "cal_booking_url")?.value || "",
+          );
+          setTestimonialsEnabled(
+            settingsData?.find((setting) => setting.key === "testimonials_enabled")?.value ===
+              "true",
           );
         }
       } catch (error) {
@@ -335,6 +340,35 @@ function DashboardPage() {
       ]);
     }
     setSettingsStatus("Cal.com link saved.");
+  };
+
+  const saveTestimonialsEnabled = async (enabled: boolean) => {
+    setSettingsStatus("");
+    setTestimonialsEnabled(enabled);
+
+    const { data, error } = await supabase
+      .from("site_settings")
+      .upsert({
+        key: "testimonials_enabled",
+        value: String(enabled),
+        updated_at: new Date().toISOString(),
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      setSettingsStatus(error.message);
+      setTestimonialsEnabled(!enabled);
+      return;
+    }
+
+    if (data) {
+      setSettings((current) => [
+        data,
+        ...current.filter((setting) => setting.key !== "testimonials_enabled"),
+      ]);
+    }
+    setSettingsStatus(enabled ? "Testimonials are visible." : "Testimonials are hidden.");
   };
 
   const inviteCustomer = async () => {
@@ -527,6 +561,8 @@ function DashboardPage() {
               calBookingUrl={calBookingUrl}
               setCalBookingUrl={setCalBookingUrl}
               saveCalBookingUrl={saveCalBookingUrl}
+              testimonialsEnabled={testimonialsEnabled}
+              saveTestimonialsEnabled={saveTestimonialsEnabled}
               settingsStatus={settingsStatus}
             />
           )}
@@ -1206,53 +1242,91 @@ function SettingsView({
   calBookingUrl,
   setCalBookingUrl,
   saveCalBookingUrl,
+  testimonialsEnabled,
+  saveTestimonialsEnabled,
   settingsStatus,
 }: {
   calBookingUrl: string;
   setCalBookingUrl: (value: string) => void;
   saveCalBookingUrl: () => void;
+  testimonialsEnabled: boolean;
+  saveTestimonialsEnabled: (enabled: boolean) => void;
   settingsStatus: string;
 }) {
   return (
     <section className="grid gap-5 xl:grid-cols-[1.1fr_0.9fr]">
-      <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
-        <div className="mb-6 flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Link className="h-5 w-5" />
+      <div className="space-y-5">
+        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Link className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                Booking integration
+              </p>
+              <h3 className="font-serif text-2xl text-foreground">Cal.com link</h3>
+            </div>
           </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              Booking integration
-            </p>
-            <h3 className="font-serif text-2xl text-foreground">Cal.com link</h3>
-          </div>
+
+          <label className="block text-sm font-semibold text-foreground">
+            Public booking URL
+            <input
+              type="url"
+              value={calBookingUrl}
+              onChange={(event) => setCalBookingUrl(event.target.value)}
+              className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+              placeholder="https://cal.com/..."
+            />
+          </label>
+
+          <button
+            type="button"
+            onClick={saveCalBookingUrl}
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary"
+          >
+            Save Cal.com Link
+            <Save className="h-4 w-4" />
+          </button>
         </div>
 
-        <label className="block text-sm font-semibold text-foreground">
-          Public booking URL
-          <input
-            type="url"
-            value={calBookingUrl}
-            onChange={(event) => setCalBookingUrl(event.target.value)}
-            className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
-            placeholder="https://cal.com/..."
-          />
-        </label>
+        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+          <div className="mb-5 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                Homepage content
+              </p>
+              <h3 className="font-serif text-2xl text-foreground">Testimonials</h3>
+              <p className="mt-2 max-w-md text-sm leading-6 text-muted-foreground">
+                Keep this hidden until approved final testimonials are ready.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => saveTestimonialsEnabled(!testimonialsEnabled)}
+              className={`relative h-8 w-14 rounded-full transition ${
+                testimonialsEnabled ? "bg-primary" : "bg-muted"
+              }`}
+              aria-pressed={testimonialsEnabled}
+              aria-label="Toggle testimonials visibility"
+            >
+              <span
+                className={`absolute top-1 h-6 w-6 rounded-full bg-white shadow transition ${
+                  testimonialsEnabled ? "left-7" : "left-1"
+                }`}
+              />
+            </button>
+          </div>
+          <p className="rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">
+            Current status: {testimonialsEnabled ? "Visible on homepage" : "Hidden on homepage"}
+          </p>
+        </div>
 
         {settingsStatus && (
           <p className="mt-4 rounded-xl bg-muted p-3 text-sm text-muted-foreground">
             {settingsStatus}
           </p>
         )}
-
-        <button
-          type="button"
-          onClick={saveCalBookingUrl}
-          className="mt-5 inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary"
-        >
-          Save Cal.com Link
-          <Save className="h-4 w-4" />
-        </button>
       </div>
 
       <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">

@@ -285,6 +285,12 @@ function BookingPage() {
                     )}
 
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                      <a
+                        href="/"
+                        className="inline-flex flex-1 items-center justify-center rounded-xl border border-border bg-background px-5 py-3 font-medium text-foreground transition hover:bg-muted"
+                      >
+                        Visit Website
+                      </a>
                       {hasLiveBookingUrl ? (
                         <a
                           href={bookingUrl}
@@ -292,16 +298,19 @@ function BookingPage() {
                           rel="noreferrer"
                           className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary"
                         >
-                          Open Booking Page
+                          Book Session
                           <ArrowRight className="h-4 w-4" />
                         </a>
-                      ) : null}
-                      <a
-                        href="/"
-                        className="inline-flex flex-1 items-center justify-center rounded-xl border border-border bg-background px-5 py-3 font-medium text-foreground transition hover:bg-muted"
-                      >
-                        Visit Website
-                      </a>
+                      ) : (
+                        <button
+                          type="button"
+                          disabled
+                          className="inline-flex flex-1 cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background opacity-45"
+                        >
+                          Book Session
+                          <ArrowRight className="h-4 w-4" />
+                        </button>
+                      )}
                     </div>
                   </motion.div>
                 )}
