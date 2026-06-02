@@ -56,15 +56,18 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:h-20">
         <a
           href="#home"
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-white sm:h-12 sm:w-12 lg:h-14 lg:w-14"
+          className="flex min-w-0 shrink-0 items-center gap-3 text-white"
           aria-label={siteConfig.shortName}
         >
           <img
             src={navMarkSrc}
             alt={siteConfig.shortName}
-            className="h-full w-full object-contain"
+            className="h-11 w-11 shrink-0 object-contain sm:h-12 sm:w-12 lg:h-14 lg:w-14"
             draggable={false}
           />
+          <span className="hidden font-serif text-2xl font-semibold leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-3xl">
+            A&apos;New Dawn
+          </span>
         </a>
 
         <div className="hidden items-center gap-7 text-sm font-semibold text-white/66 md:flex">
