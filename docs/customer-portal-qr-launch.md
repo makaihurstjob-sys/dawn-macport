@@ -44,7 +44,11 @@ Run the migration:
 
 ```txt
 supabase/migrations/20260602120000_customer_courses_qr.sql
+supabase/migrations/20260602154500_onboarding_worksheet_resource.sql
+supabase/migrations/20260602230000_activate_customer_invites.sql
 ```
+
+The final invite activation migration turns a customer's `invited` enrollment into `active` when they log into the portal for the first time.
 
 Then update Supabase Auth URL settings:
 
