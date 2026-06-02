@@ -105,7 +105,7 @@ AS $$
     FROM public.customer_enrollments
     WHERE customer_id = auth.uid()
       AND course_id = _course_id
-      AND status IN ('active', 'completed')
+      AND status IN ('invited', 'active', 'completed')
   );
 $$;
 

@@ -69,6 +69,8 @@ function CoursePage() {
       if (!user) return;
       setUserId(user.id);
 
+      await supabase.rpc("accept_customer_course_invites");
+
       const { data: courseData, error: courseError } = await supabase
         .from("courses")
         .select("id,title,slug,description,course_resources(id,title,description,url,sort_order)")
