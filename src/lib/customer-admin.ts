@@ -11,12 +11,8 @@ type InviteCustomerInput = {
 };
 
 function getPublicSiteUrl() {
-  return (
-    process.env.VITE_PUBLIC_SITE_URL ||
-    process.env.URL ||
-    process.env.DEPLOY_PRIME_URL ||
-    "https://app.anewdawncoaching.org"
-  );
+  const configuredUrl = process.env.VITE_PUBLIC_SITE_URL?.trim();
+  return configuredUrl || "https://app.anewdawncoaching.org";
 }
 
 function getSupabaseAuthClient(accessToken: string) {
