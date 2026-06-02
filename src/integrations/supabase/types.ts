@@ -80,6 +80,173 @@ export type Database = {
         };
         Relationships: [];
       };
+      course_progress: {
+        Row: {
+          completed: boolean;
+          completed_at: string | null;
+          course_id: string;
+          customer_id: string;
+          id: string;
+          item_key: string;
+          updated_at: string;
+        };
+        Insert: {
+          completed?: boolean;
+          completed_at?: string | null;
+          course_id: string;
+          customer_id: string;
+          id?: string;
+          item_key: string;
+          updated_at?: string;
+        };
+        Update: {
+          completed?: boolean;
+          completed_at?: string | null;
+          course_id?: string;
+          customer_id?: string;
+          id?: string;
+          item_key?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "course_progress_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "courses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "course_progress_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      course_resources: {
+        Row: {
+          active: boolean;
+          course_id: string;
+          created_at: string;
+          description: string;
+          id: string;
+          sort_order: number;
+          title: string;
+          updated_at: string;
+          url: string | null;
+        };
+        Insert: {
+          active?: boolean;
+          course_id: string;
+          created_at?: string;
+          description?: string;
+          id?: string;
+          sort_order?: number;
+          title: string;
+          updated_at?: string;
+          url?: string | null;
+        };
+        Update: {
+          active?: boolean;
+          course_id?: string;
+          created_at?: string;
+          description?: string;
+          id?: string;
+          sort_order?: number;
+          title?: string;
+          updated_at?: string;
+          url?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "course_resources_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "courses";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      courses: {
+        Row: {
+          created_at: string;
+          description: string;
+          id: string;
+          slug: string;
+          status: string;
+          title: string;
+          updated_at: string;
+        };
+        Insert: {
+          created_at?: string;
+          description?: string;
+          id?: string;
+          slug: string;
+          status?: string;
+          title: string;
+          updated_at?: string;
+        };
+        Update: {
+          created_at?: string;
+          description?: string;
+          id?: string;
+          slug?: string;
+          status?: string;
+          title?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      customer_enrollments: {
+        Row: {
+          accepted_at: string | null;
+          course_id: string;
+          created_at: string;
+          customer_id: string;
+          id: string;
+          invited_at: string;
+          status: string;
+          updated_at: string;
+        };
+        Insert: {
+          accepted_at?: string | null;
+          course_id: string;
+          created_at?: string;
+          customer_id: string;
+          id?: string;
+          invited_at?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Update: {
+          accepted_at?: string | null;
+          course_id?: string;
+          created_at?: string;
+          customer_id?: string;
+          id?: string;
+          invited_at?: string;
+          status?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "customer_enrollments_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "courses";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "customer_enrollments_customer_id_fkey";
+            columns: ["customer_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       dashboard_notes: {
         Row: {
           created_at: string;
@@ -197,23 +364,73 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string;
+          full_name: string | null;
           id: string;
           role: Database["public"]["Enums"]["app_role"];
+          updated_at: string;
           username: string | null;
         };
         Insert: {
           created_at?: string;
+          full_name?: string | null;
           id: string;
           role?: Database["public"]["Enums"]["app_role"];
+          updated_at?: string;
           username?: string | null;
         };
         Update: {
           created_at?: string;
+          full_name?: string | null;
           id?: string;
           role?: Database["public"]["Enums"]["app_role"];
+          updated_at?: string;
           username?: string | null;
         };
         Relationships: [];
+      };
+      qr_links: {
+        Row: {
+          active: boolean;
+          course_id: string;
+          created_at: string;
+          id: string;
+          label: string;
+          last_scanned_at: string | null;
+          scan_count: number;
+          slug: string;
+          updated_at: string;
+        };
+        Insert: {
+          active?: boolean;
+          course_id: string;
+          created_at?: string;
+          id?: string;
+          label: string;
+          last_scanned_at?: string | null;
+          scan_count?: number;
+          slug: string;
+          updated_at?: string;
+        };
+        Update: {
+          active?: boolean;
+          course_id?: string;
+          created_at?: string;
+          id?: string;
+          label?: string;
+          last_scanned_at?: string | null;
+          scan_count?: number;
+          slug?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "qr_links_course_id_fkey";
+            columns: ["course_id"];
+            isOneToOne: false;
+            referencedRelation: "courses";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       site_settings: {
         Row: {
@@ -254,9 +471,22 @@ export type Database = {
         Args: { _role: Database["public"]["Enums"]["app_role"] };
         Returns: boolean;
       };
+      is_enrolled_in_course: {
+        Args: { _course_id: string };
+        Returns: boolean;
+      };
+      resolve_qr_link: {
+        Args: { _slug: string };
+        Returns: {
+          slug: string;
+          course_slug: string;
+          course_title: string;
+          active: boolean;
+        }[];
+      };
     };
     Enums: {
-      app_role: "admin" | "developer";
+      app_role: "admin" | "developer" | "customer";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -382,7 +612,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "developer"],
+      app_role: ["admin", "developer", "customer"],
     },
   },
 } as const;

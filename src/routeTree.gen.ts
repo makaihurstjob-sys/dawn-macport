@@ -12,9 +12,13 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as FormRouteImport } from './routes/form'
 import { Route as DevGateN9Qk4Lw8RouteImport } from './routes/dev-gate-n9Qk4Lw8'
 import { Route as DawnGate9vK2mQ7pRouteImport } from './routes/dawn-gate-9vK2mQ7p'
+import { Route as CustomerLoginRouteImport } from './routes/customer-login'
 import { Route as BookRouteImport } from './routes/book'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GoSlugRouteImport } from './routes/go.$slug'
+import { Route as CourseSlugRouteImport } from './routes/course.$slug'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 
 const FormRoute = FormRouteImport.update({
@@ -32,9 +36,19 @@ const DawnGate9vK2mQ7pRoute = DawnGate9vK2mQ7pRouteImport.update({
   path: '/dawn-gate-9vK2mQ7p',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CustomerLoginRoute = CustomerLoginRouteImport.update({
+  id: '/customer-login',
+  path: '/customer-login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BookRoute = BookRouteImport.update({
   id: '/book',
   path: '/book',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
@@ -46,6 +60,16 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GoSlugRoute = GoSlugRouteImport.update({
+  id: '/go/$slug',
+  path: '/go/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CourseSlugRoute = CourseSlugRouteImport.update({
+  id: '/course/$slug',
+  path: '/course/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -54,65 +78,93 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/book': typeof BookRoute
+  '/customer-login': typeof CustomerLoginRoute
   '/dawn-gate-9vK2mQ7p': typeof DawnGate9vK2mQ7pRoute
   '/dev-gate-n9Qk4Lw8': typeof DevGateN9Qk4Lw8Route
   '/form': typeof FormRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/course/$slug': typeof CourseSlugRoute
+  '/go/$slug': typeof GoSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app': typeof AppRoute
   '/book': typeof BookRoute
+  '/customer-login': typeof CustomerLoginRoute
   '/dawn-gate-9vK2mQ7p': typeof DawnGate9vK2mQ7pRoute
   '/dev-gate-n9Qk4Lw8': typeof DevGateN9Qk4Lw8Route
   '/form': typeof FormRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/course/$slug': typeof CourseSlugRoute
+  '/go/$slug': typeof GoSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
+  '/app': typeof AppRoute
   '/book': typeof BookRoute
+  '/customer-login': typeof CustomerLoginRoute
   '/dawn-gate-9vK2mQ7p': typeof DawnGate9vK2mQ7pRoute
   '/dev-gate-n9Qk4Lw8': typeof DevGateN9Qk4Lw8Route
   '/form': typeof FormRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/course/$slug': typeof CourseSlugRoute
+  '/go/$slug': typeof GoSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/app'
     | '/book'
+    | '/customer-login'
     | '/dawn-gate-9vK2mQ7p'
     | '/dev-gate-n9Qk4Lw8'
     | '/form'
     | '/dashboard'
+    | '/course/$slug'
+    | '/go/$slug'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/app'
     | '/book'
+    | '/customer-login'
     | '/dawn-gate-9vK2mQ7p'
     | '/dev-gate-n9Qk4Lw8'
     | '/form'
     | '/dashboard'
+    | '/course/$slug'
+    | '/go/$slug'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/app'
     | '/book'
+    | '/customer-login'
     | '/dawn-gate-9vK2mQ7p'
     | '/dev-gate-n9Qk4Lw8'
     | '/form'
     | '/_authenticated/dashboard'
+    | '/course/$slug'
+    | '/go/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
+  AppRoute: typeof AppRoute
   BookRoute: typeof BookRoute
+  CustomerLoginRoute: typeof CustomerLoginRoute
   DawnGate9vK2mQ7pRoute: typeof DawnGate9vK2mQ7pRoute
   DevGateN9Qk4Lw8Route: typeof DevGateN9Qk4Lw8Route
   FormRoute: typeof FormRoute
+  CourseSlugRoute: typeof CourseSlugRoute
+  GoSlugRoute: typeof GoSlugRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -138,11 +190,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DawnGate9vK2mQ7pRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/customer-login': {
+      id: '/customer-login'
+      path: '/customer-login'
+      fullPath: '/customer-login'
+      preLoaderRoute: typeof CustomerLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/book': {
       id: '/book'
       path: '/book'
       fullPath: '/book'
       preLoaderRoute: typeof BookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -157,6 +223,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/go/$slug': {
+      id: '/go/$slug'
+      path: '/go/$slug'
+      fullPath: '/go/$slug'
+      preLoaderRoute: typeof GoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/course/$slug': {
+      id: '/course/$slug'
+      path: '/course/$slug'
+      fullPath: '/course/$slug'
+      preLoaderRoute: typeof CourseSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/dashboard': {
@@ -184,10 +264,14 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
+  AppRoute: AppRoute,
   BookRoute: BookRoute,
+  CustomerLoginRoute: CustomerLoginRoute,
   DawnGate9vK2mQ7pRoute: DawnGate9vK2mQ7pRoute,
   DevGateN9Qk4Lw8Route: DevGateN9Qk4Lw8Route,
   FormRoute: FormRoute,
+  CourseSlugRoute: CourseSlugRoute,
+  GoSlugRoute: GoSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

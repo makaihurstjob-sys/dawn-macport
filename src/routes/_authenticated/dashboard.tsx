@@ -4,7 +4,9 @@ import {
   CalendarCheck,
   ClipboardList,
   Code2,
+  Copy,
   Download,
+  ExternalLink,
   FileJson,
   FileText,
   Home,
@@ -17,10 +19,14 @@ import {
   Save,
   Settings,
   Trash2,
+  UserPlus,
   UserRoundCheck,
+  UsersRound,
+  QrCode,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
+import { inviteCustomerToCourse } from "@/lib/customer-admin";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -31,14 +37,31 @@ type BookingQualification = Tables<"booking_qualifications">;
 type IntakeSubmission = Tables<"intake_submissions">;
 type DashboardNote = Tables<"dashboard_notes">;
 type SiteSetting = Tables<"site_settings">;
-type Role = "admin" | "developer";
-type View = "overview" | "contacts" | "bookings" | "intake" | "notes" | "settings" | "developer";
+type Course = Tables<"courses">;
+type CourseProgress = Tables<"course_progress">;
+type CustomerProfile = Tables<"profiles">;
+type QrLink = Tables<"qr_links"> & { courses?: { title: string; slug: string } | null };
+type CustomerEnrollment = Tables<"customer_enrollments"> & {
+  courses?: { title: string; slug: string } | null;
+  profiles?: { username: string | null; full_name: string | null } | null;
+};
+type Role = "admin" | "developer" | "customer";
+type View =
+  | "overview"
+  | "contacts"
+  | "bookings"
+  | "intake"
+  | "customers"
+  | "notes"
+  | "settings"
+  | "developer";
 
 const navItems: Array<{ id: View; label: string; icon: typeof Home; developerOnly?: boolean }> = [
   { id: "overview", label: "Overview", icon: Home },
   { id: "contacts", label: "Contact Messages", icon: Mail },
   { id: "bookings", label: "Booking Quiz", icon: CalendarCheck },
   { id: "intake", label: "Survey Entries", icon: ClipboardList },
+  { id: "customers", label: "Customers / Courses", icon: UsersRound },
   { id: "notes", label: "Notes", icon: NotebookPen },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "developer", label: "Developer", icon: Code2, developerOnly: true },
@@ -79,11 +102,55 @@ function DashboardPage() {
   const [intakes, setIntakes] = useState<IntakeSubmission[]>([]);
   const [notes, setNotes] = useState<DashboardNote[]>([]);
   const [settings, setSettings] = useState<SiteSetting[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [customers, setCustomers] = useState<CustomerProfile[]>([]);
+  const [enrollments, setEnrollments] = useState<CustomerEnrollment[]>([]);
+  const [courseProgress, setCourseProgress] = useState<CourseProgress[]>([]);
+  const [qrLinks, setQrLinks] = useState<QrLink[]>([]);
   const [noteText, setNoteText] = useState("");
   const [calBookingUrl, setCalBookingUrl] = useState("");
   const [settingsStatus, setSettingsStatus] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [customerEmail, setCustomerEmail] = useState("");
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+  const [qrSlug, setQrSlug] = useState("dawn-method");
+  const [qrStatus, setQrStatus] = useState("");
+  const [customerStatus, setCustomerStatus] = useState("");
   const [loading, setLoading] = useState(true);
   const [dashboardError, setDashboardError] = useState("");
+
+  const refreshCustomerCourseData = async () => {
+    const [courseResult, customerResult, enrollmentResult, progressResult, qrResult] =
+      await withTimeout(
+        Promise.all([
+          supabase.from("courses").select("*").order("created_at", { ascending: true }),
+          supabase.from("profiles").select("*").eq("role", "customer").order("created_at", {
+            ascending: false,
+          }),
+          supabase
+            .from("customer_enrollments")
+            .select("*,courses(title,slug),profiles(username,full_name)")
+            .order("created_at", { ascending: false }),
+          supabase.from("course_progress").select("*"),
+          supabase
+            .from("qr_links")
+            .select("*,courses(title,slug)")
+            .order("created_at", { ascending: false }),
+        ]),
+        "Customer/course data did not load. Confirm the customer course migration has been run.",
+      );
+
+    setCourses(courseResult.data || []);
+    setCustomers(customerResult.data || []);
+    setEnrollments((enrollmentResult.data || []) as CustomerEnrollment[]);
+    setCourseProgress(progressResult.data || []);
+    setQrLinks((qrResult.data || []) as QrLink[]);
+
+    const firstCourseId = courseResult.data?.[0]?.id;
+    if (firstCourseId) {
+      setSelectedCourseId((current) => current || firstCourseId);
+    }
+  };
 
   useEffect(() => {
     const fetchDashboard = async () => {
@@ -127,6 +194,8 @@ function DashboardPage() {
         setIntakes(intakeResult.data || []);
         setNotes(noteResult.data || []);
 
+        await refreshCustomerCourseData();
+
         const { data: settingsData, error: settingsError } = await supabase
           .from("site_settings")
           .select("*");
@@ -168,8 +237,13 @@ function DashboardPage() {
       surveyEntries: intakes,
       notes,
       settings,
+      courses,
+      customers,
+      enrollments,
+      courseProgress,
+      qrLinks,
     }),
-    [bookings, contacts, intakes, notes, settings],
+    [bookings, contacts, courseProgress, courses, customers, enrollments, intakes, notes, qrLinks, settings],
   );
 
   const handleLogout = async () => {
@@ -263,6 +337,79 @@ function DashboardPage() {
     setSettingsStatus("Cal.com link saved.");
   };
 
+  const inviteCustomer = async () => {
+    setCustomerStatus("");
+    setDashboardError("");
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setCustomerStatus("Log in again before inviting a customer.");
+      return;
+    }
+
+    try {
+      await inviteCustomerToCourse({
+        data: {
+          accessToken: session.access_token,
+          email: customerEmail,
+          fullName: customerName,
+          courseId: selectedCourseId,
+        },
+      });
+      setCustomerStatus("Customer invite sent and course enrollment created.");
+      setCustomerName("");
+      setCustomerEmail("");
+      await refreshCustomerCourseData();
+    } catch (error) {
+      setCustomerStatus(error instanceof Error ? error.message : "Customer invite failed.");
+    }
+  };
+
+  const createQrLink = async () => {
+    setQrStatus("");
+    const slug = qrSlug.trim().toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/-+/g, "-");
+    if (!slug || !selectedCourseId) return;
+
+    const course = courses.find((item) => item.id === selectedCourseId);
+    const { error } = await supabase.from("qr_links").upsert({
+      slug,
+      course_id: selectedCourseId,
+      label: `${course?.title || "Course"} QR`,
+      active: true,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (error) {
+      setQrStatus(error.message);
+      return;
+    }
+
+    setQrStatus("QR route saved.");
+    await refreshCustomerCourseData();
+  };
+
+  const toggleQrLink = async (qrLink: QrLink) => {
+    const { error } = await supabase
+      .from("qr_links")
+      .update({ active: !qrLink.active, updated_at: new Date().toISOString() })
+      .eq("id", qrLink.id);
+
+    if (error) {
+      setQrStatus(error.message);
+      return;
+    }
+
+    await refreshCustomerCourseData();
+  };
+
+  const copyText = async (value: string) => {
+    await navigator.clipboard.writeText(value);
+    setQrStatus("Copied.");
+  };
+
   return (
     <div className="min-h-screen bg-[#f7f0e7] text-foreground">
       <div className="flex min-h-screen flex-col lg:flex-row">
@@ -343,6 +490,29 @@ function DashboardPage() {
             <BookingsView bookings={bookings} deleteBooking={deleteBooking} />
           )}
           {activeView === "intake" && <IntakeView intakes={intakes} />}
+          {activeView === "customers" && (
+            <CustomersCoursesView
+              courses={courses}
+              customers={customers}
+              enrollments={enrollments}
+              progress={courseProgress}
+              qrLinks={qrLinks}
+              customerName={customerName}
+              setCustomerName={setCustomerName}
+              customerEmail={customerEmail}
+              setCustomerEmail={setCustomerEmail}
+              selectedCourseId={selectedCourseId}
+              setSelectedCourseId={setSelectedCourseId}
+              customerStatus={customerStatus}
+              inviteCustomer={inviteCustomer}
+              qrSlug={qrSlug}
+              setQrSlug={setQrSlug}
+              qrStatus={qrStatus}
+              createQrLink={createQrLink}
+              toggleQrLink={toggleQrLink}
+              copyText={copyText}
+            />
+          )}
           {activeView === "notes" && (
             <NotesView
               notes={notes}
@@ -644,6 +814,327 @@ function IntakeView({ intakes }: { intakes: IntakeSubmission[] }) {
           </details>
         ))
       )}
+    </section>
+  );
+}
+
+function getCustomerAppBaseUrl() {
+  if (typeof window === "undefined") return "https://app.anewdawncoaching.org";
+  if (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")) {
+    return window.location.origin;
+  }
+  return "https://app.anewdawncoaching.org";
+}
+
+function getQrUrl(slug: string) {
+  return `${getCustomerAppBaseUrl()}/go/${slug}`;
+}
+
+function getQrImageUrl(slug: string) {
+  return `https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${encodeURIComponent(
+    getQrUrl(slug),
+  )}`;
+}
+
+function CustomersCoursesView({
+  courses,
+  customers,
+  enrollments,
+  progress,
+  qrLinks,
+  customerName,
+  setCustomerName,
+  customerEmail,
+  setCustomerEmail,
+  selectedCourseId,
+  setSelectedCourseId,
+  customerStatus,
+  inviteCustomer,
+  qrSlug,
+  setQrSlug,
+  qrStatus,
+  createQrLink,
+  toggleQrLink,
+  copyText,
+}: {
+  courses: Course[];
+  customers: CustomerProfile[];
+  enrollments: CustomerEnrollment[];
+  progress: CourseProgress[];
+  qrLinks: QrLink[];
+  customerName: string;
+  setCustomerName: (value: string) => void;
+  customerEmail: string;
+  setCustomerEmail: (value: string) => void;
+  selectedCourseId: string;
+  setSelectedCourseId: (value: string) => void;
+  customerStatus: string;
+  inviteCustomer: () => void;
+  qrSlug: string;
+  setQrSlug: (value: string) => void;
+  qrStatus: string;
+  createQrLink: () => void;
+  toggleQrLink: (qrLink: QrLink) => void;
+  copyText: (value: string) => void;
+}) {
+  const completedByCustomer = useMemo(() => {
+    return progress.reduce<Record<string, number>>((acc, item) => {
+      if (item.completed) acc[item.customer_id] = (acc[item.customer_id] || 0) + 1;
+      return acc;
+    }, {});
+  }, [progress]);
+
+  return (
+    <section className="space-y-5">
+      <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <UserPlus className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                Invite-only setup
+              </p>
+              <h3 className="font-serif text-2xl text-foreground">Add customer</h3>
+            </div>
+          </div>
+
+          <div className="grid gap-4">
+            <label className="block text-sm font-semibold text-foreground">
+              Customer name
+              <input
+                type="text"
+                value={customerName}
+                onChange={(event) => setCustomerName(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                placeholder="Novel Allen"
+              />
+            </label>
+            <label className="block text-sm font-semibold text-foreground">
+              Customer email
+              <input
+                type="email"
+                value={customerEmail}
+                onChange={(event) => setCustomerEmail(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                placeholder="customer@example.com"
+              />
+            </label>
+            <label className="block text-sm font-semibold text-foreground">
+              Assign course
+              <select
+                value={selectedCourseId}
+                onChange={(event) => setSelectedCourseId(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+              >
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          {customerStatus && (
+            <p className="mt-4 rounded-xl bg-muted p-3 text-sm text-muted-foreground">
+              {customerStatus}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={inviteCustomer}
+            disabled={!customerName.trim() || !customerEmail.trim() || !selectedCourseId}
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Send Invite
+            <UserPlus className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <QrCode className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                QR routes
+              </p>
+              <h3 className="font-serif text-2xl text-foreground">Generate short link</h3>
+            </div>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-[1fr_0.9fr]">
+            <label className="block text-sm font-semibold text-foreground">
+              QR slug
+              <input
+                type="text"
+                value={qrSlug}
+                onChange={(event) => setQrSlug(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                placeholder="dawn-method"
+              />
+            </label>
+            <label className="block text-sm font-semibold text-foreground">
+              Course
+              <select
+                value={selectedCourseId}
+                onChange={(event) => setSelectedCourseId(event.target.value)}
+                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+              >
+                {courses.map((course) => (
+                  <option key={course.id} value={course.id}>
+                    {course.title}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+
+          {qrStatus && (
+            <p className="mt-4 rounded-xl bg-muted p-3 text-sm text-muted-foreground">
+              {qrStatus}
+            </p>
+          )}
+
+          <button
+            type="button"
+            onClick={createQrLink}
+            disabled={!qrSlug.trim() || !selectedCourseId}
+            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Save QR Route
+            <QrCode className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+
+      <div className="grid gap-5 xl:grid-cols-[1fr_1fr]">
+        <section className="rounded-2xl border border-border/70 bg-background shadow-sm">
+          <div className="border-b border-border/70 px-6 py-4">
+            <h3 className="font-serif text-2xl text-foreground">Customer access</h3>
+          </div>
+          {customers.length === 0 ? (
+            <EmptyState label="No customer profiles yet." />
+          ) : (
+            <div className="divide-y divide-border/70">
+              {customers.map((customer) => {
+                const customerEnrollments = enrollments.filter(
+                  (enrollment) => enrollment.customer_id === customer.id,
+                );
+                return (
+                  <article key={customer.id} className="p-5">
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <h4 className="font-serif text-2xl text-foreground">
+                          {customer.full_name || "Unnamed customer"}
+                        </h4>
+                        <p className="text-sm text-muted-foreground">{customer.username}</p>
+                      </div>
+                      <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase text-primary">
+                        {completedByCustomer[customer.id] || 0} complete
+                      </span>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {customerEnrollments.map((enrollment) => (
+                        <span
+                          key={enrollment.id}
+                          className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"
+                        >
+                          {enrollment.courses?.title || "Course"} - {enrollment.status}
+                        </span>
+                      ))}
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+        <section className="rounded-2xl border border-border/70 bg-background shadow-sm">
+          <div className="border-b border-border/70 px-6 py-4">
+            <h3 className="font-serif text-2xl text-foreground">QR links</h3>
+          </div>
+          {qrLinks.length === 0 ? (
+            <EmptyState label="No QR links yet." />
+          ) : (
+            <div className="divide-y divide-border/70">
+              {qrLinks.map((qrLink) => {
+                const qrUrl = getQrUrl(qrLink.slug);
+                return (
+                  <article key={qrLink.id} className="grid gap-5 p-5 sm:grid-cols-[140px_1fr]">
+                    <img
+                      src={getQrImageUrl(qrLink.slug)}
+                      alt={`QR code for ${qrLink.label}`}
+                      className="h-[140px] w-[140px] rounded-xl border border-border bg-white p-2"
+                    />
+                    <div>
+                      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <h4 className="font-serif text-2xl text-foreground">{qrLink.label}</h4>
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {qrLink.courses?.title || "Course"} - {qrLink.scan_count} scans
+                          </p>
+                        </div>
+                        <span
+                          className={`w-fit rounded-full px-3 py-1 text-xs font-bold uppercase ${
+                            qrLink.active
+                              ? "bg-emerald-50 text-emerald-700"
+                              : "bg-muted text-muted-foreground"
+                          }`}
+                        >
+                          {qrLink.active ? "Active" : "Inactive"}
+                        </span>
+                      </div>
+                      <p className="mt-4 break-all rounded-xl bg-muted/55 p-3 font-mono text-xs text-muted-foreground">
+                        {qrUrl}
+                      </p>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => copyText(qrUrl)}
+                          className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                        >
+                          <Copy className="h-4 w-4" />
+                          Copy link
+                        </button>
+                        <a
+                          href={getQrImageUrl(qrLink.slug)}
+                          download={`${qrLink.slug}-qr.png`}
+                          className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                        >
+                          <Download className="h-4 w-4" />
+                          QR image
+                        </a>
+                        <a
+                          href={qrUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center gap-2 rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                          Test route
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => toggleQrLink(qrLink)}
+                          className="inline-flex items-center gap-2 rounded-xl bg-foreground px-4 py-2 text-sm font-medium text-background transition hover:bg-primary"
+                        >
+                          {qrLink.active ? "Deactivate" : "Activate"}
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
+        </section>
+      </div>
     </section>
   );
 }
