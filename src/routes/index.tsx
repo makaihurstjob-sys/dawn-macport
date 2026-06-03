@@ -800,10 +800,20 @@ function FloatingCoachChat() {
           </div>
         </motion.div>
       )}
+      {!open && (
+        <motion.div
+          initial={{ opacity: 0, y: 10, scale: 0.97 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          className="relative mr-1 max-w-[min(78vw,260px)] rounded-3xl bg-[#0a84ff] px-4 py-3 text-sm font-semibold leading-5 text-white shadow-[0_20px_60px_-24px_rgba(10,132,255,0.85)] ring-1 ring-white/25"
+        >
+          Welcome! Click me if you need any help!
+          <span className="absolute -bottom-1.5 right-7 h-4 w-4 rotate-45 bg-[#0a84ff]" />
+        </motion.div>
+      )}
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[#241f2f] text-[#fff8ea] shadow-[0_22px_60px_-24px_rgba(36,31,44,0.85)] transition hover:-translate-y-0.5 hover:bg-primary"
+        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,#fff2c9_0%,#f6b24a_46%,#e9862d_100%)] text-[#241f2f] shadow-[0_22px_70px_-22px_rgba(233,134,45,0.95)] ring-2 ring-white/70 transition hover:-translate-y-0.5 hover:shadow-[0_26px_80px_-22px_rgba(233,134,45,1)]"
         aria-label={open ? "Close A'New Dawn assistant" : "Open A'New Dawn assistant"}
       >
         <MessageCircleHeart className="h-6 w-6" />
