@@ -65,7 +65,7 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
             className="h-9 w-auto max-w-[84px] shrink-0 object-contain sm:h-10 sm:max-w-[104px] lg:h-11 lg:max-w-[118px]"
             draggable={false}
           />
-          <span className="brand-script hidden text-[2.05rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[2.5rem]">
+          <span className="brand-script hidden text-[1.65rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[2rem]">
             A&apos;New Dawn
           </span>
         </a>
