@@ -61,11 +61,11 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
         >
           <img
             src={navMarkSrc}
-            alt={siteConfig.shortName}
-            className="h-11 w-11 shrink-0 object-contain sm:h-12 sm:w-12 lg:h-14 lg:w-14"
+            alt=""
+            className="h-9 w-auto max-w-[84px] shrink-0 object-contain sm:h-10 sm:max-w-[104px] lg:h-11 lg:max-w-[118px]"
             draggable={false}
           />
-          <span className="hidden font-serif text-2xl font-semibold leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-3xl">
+          <span className="brand-script hidden text-[2.05rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[2.5rem]">
             A&apos;New Dawn
           </span>
         </a>
