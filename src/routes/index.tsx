@@ -65,7 +65,7 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
             className="h-9 w-auto max-w-[84px] shrink-0 object-contain sm:h-10 sm:max-w-[104px] lg:h-11 lg:max-w-[118px]"
             draggable={false}
           />
-          <span className="brand-script hidden text-[1.65rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[2rem]">
+          <span className="brand-script hidden text-[1.5rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[1.5rem]">
             A&apos;New Dawn
           </span>
         </a>
@@ -804,7 +804,7 @@ function FloatingCoachChat() {
         <motion.div
           initial={{ opacity: 0, y: 10, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="relative mr-1 max-w-[min(78vw,260px)] rounded-3xl bg-[#0a84ff] px-4 py-3 text-sm font-semibold leading-5 text-white shadow-[0_20px_60px_-24px_rgba(10,132,255,0.85)] ring-1 ring-white/25"
+          className="relative mr-1 max-w-[min(78vw,260px)] rounded-3xl bg-[#0a84ff] px-4 py-3 text-sm font-normal leading-5 text-white shadow-[0_20px_60px_-24px_rgba(10,132,255,0.85)] ring-1 ring-white/25"
         >
           Welcome! Click me if you need any help!
           <span className="absolute -bottom-1.5 right-7 h-4 w-4 rotate-45 bg-[#0a84ff]" />
