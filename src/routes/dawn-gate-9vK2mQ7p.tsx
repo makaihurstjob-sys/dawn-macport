@@ -53,11 +53,18 @@ function AdminLogin() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f9f1e7] p-4">
-      <div className="absolute inset-x-0 top-0 h-64 bg-[linear-gradient(180deg,#2d2536_0%,#8b5f68_60%,transparent_100%)]" />
-      <main className="relative w-full max-w-md rounded-2xl border border-white/60 bg-background/92 p-7 shadow-[0_36px_110px_-70px_rgba(45,37,54,0.95)] backdrop-blur-xl">
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#fff7e9] p-4 text-foreground dark:bg-[#17131f]">
+      <div
+        className="absolute inset-0 bg-[linear-gradient(180deg,#fffaf1_0%,#f5daa6_42%,#eba86f_76%,#fff1dc_100%)] dark:bg-[linear-gradient(180deg,#17131f_0%,#262131_40%,#5a3d49_72%,#17131f_100%)]"
+        aria-hidden="true"
+      />
+      <div
+        className="absolute inset-x-0 bottom-0 h-[42vh] bg-[linear-gradient(180deg,transparent_0%,rgba(255,247,233,0.78)_74%,#fff7e9_100%)] dark:bg-[linear-gradient(180deg,transparent_0%,rgba(23,19,31,0.72)_58%,#17131f_100%)]"
+        aria-hidden="true"
+      />
+      <main className="relative w-full max-w-md rounded-2xl border border-white/70 bg-[#fffaf1]/94 p-7 shadow-[0_36px_110px_-70px_rgba(95,59,36,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-[#221d2b]/92 dark:shadow-[0_36px_110px_-70px_rgba(0,0,0,1)]">
         <div className="mb-7 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-foreground text-background">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#4f332b] text-white dark:bg-[#f4bd78] dark:text-[#241f2f]">
             <Router className="h-6 w-6" />
           </div>
           <div>
@@ -78,7 +85,7 @@ function AdminLogin() {
               type="text"
               required
               autoComplete="username"
-              className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+              className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/10"
               value={username}
               onChange={(event) => setUsername(event.target.value)}
             />
@@ -89,7 +96,7 @@ function AdminLogin() {
               type="password"
               required
               autoComplete="current-password"
-              className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+              className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/10"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
             />
@@ -97,7 +104,7 @@ function AdminLogin() {
           <button
             type="submit"
             disabled={loading}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#4f332b] px-5 py-3 font-medium text-white transition hover:bg-primary disabled:opacity-60 dark:bg-[#f4bd78] dark:text-[#241f2f] dark:hover:bg-[#ffd28c]"
           >
             {loading ? "Authenticating..." : "Login"}
             <ShieldCheck className="h-4 w-4" />

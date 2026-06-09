@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, ArrowRight, CalendarDays, Check, ChevronRight } from "lucide-react";
+import { siteConfig } from "@/config/site";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/book")({
@@ -41,7 +42,7 @@ const questions: Array<{
 function BookingPage() {
   const [step, setStep] = useState(0);
   const [clientName, setClientName] = useState("");
-  const [bookingUrl, setBookingUrl] = useState(import.meta.env.VITE_CAL_BOOKING_URL || "");
+  const [bookingUrl, setBookingUrl] = useState(siteConfig.bookingUrl);
   const [answers, setAnswers] = useState<Record<AnswerKey, string>>({
     seeking: "",
     life_stage: "",
@@ -58,6 +59,17 @@ function BookingPage() {
   const complete = step > questions.length;
   const currentQuestion = questions[Math.min(step, questions.length - 1)];
   const hasLiveBookingUrl = Boolean(bookingUrl);
+  const schedulerUrl = useMemo(() => {
+    if (!bookingUrl) return "";
+    try {
+      const url = new URL(bookingUrl);
+      url.searchParams.set("embed", "true");
+      if (clientName.trim()) url.searchParams.set("name", clientName.trim());
+      return url.toString();
+    } catch {
+      return bookingUrl;
+    }
+  }, [bookingUrl, clientName]);
 
   useEffect(() => {
     const loadBookingUrl = async () => {
@@ -142,7 +154,7 @@ function BookingPage() {
               </h1>
               <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-white/78 sm:text-lg">
                 Your answers help shape the best next conversation. After the quiz, the scheduler
-                will appear once the live booking link is connected.
+                will open so you can choose a time that works.
               </p>
             </div>
 
@@ -259,15 +271,14 @@ function BookingPage() {
                       Choose your session time
                     </h2>
                     <p className="mt-3 leading-7 text-muted-foreground">
-                      The scheduler will appear here once the live Cal.com booking URL is connected
-                      in configuration.
+                      Use the scheduler below to choose a time for your A&apos;New Dawn session.
                     </p>
 
                     {hasLiveBookingUrl ? (
                       <div className="mt-8 overflow-hidden rounded-2xl border border-dashed border-primary/30 bg-white/55">
                         <iframe
                           title="Cal.com booking"
-                          src={bookingUrl}
+                          src={schedulerUrl}
                           className="h-[430px] w-full bg-white"
                         />
                       </div>
@@ -277,9 +288,8 @@ function BookingPage() {
                           Scheduler connection pending
                         </p>
                         <p className="mx-auto mt-3 max-w-md leading-7 text-muted-foreground">
-                          Add a valid{" "}
-                          <span className="font-mono text-sm">VITE_CAL_BOOKING_URL</span> value when
-                          the Cal.com page is ready, and the live scheduler will appear here.
+                          Add a valid Cal.com booking URL in the dashboard settings, and the live
+                          scheduler will appear here.
                         </p>
                       </div>
                     )}

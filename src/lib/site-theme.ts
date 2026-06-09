@@ -9,7 +9,13 @@ export function normalizeWebsiteThemeMode(value?: string | null): WebsiteThemeMo
 }
 
 export function getThemeSettingKeyForPath(pathname: string) {
-  if (pathname.startsWith("/dashboard")) return DASHBOARD_THEME_SETTING_KEY;
+  if (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/dawn-gate-9vK2mQ7p") ||
+    pathname.startsWith("/dev-gate-n9Qk4Lw8")
+  ) {
+    return DASHBOARD_THEME_SETTING_KEY;
+  }
   return WEBSITE_THEME_SETTING_KEY;
 }
 

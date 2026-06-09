@@ -28,6 +28,7 @@ import {
   QrCode,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { siteConfig } from "@/config/site";
 import type { Tables } from "@/integrations/supabase/types";
 import {
   deleteBookingQualification,
@@ -234,7 +235,8 @@ function DashboardPage() {
         if (!settingsError) {
           setSettings(settingsData || []);
           setCalBookingUrl(
-            settingsData?.find((setting) => setting.key === "cal_booking_url")?.value || "",
+            settingsData?.find((setting) => setting.key === "cal_booking_url")?.value ||
+              siteConfig.bookingUrl,
           );
           setTestimonialsEnabled(
             settingsData?.find((setting) => setting.key === "testimonials_enabled")?.value ===
@@ -1517,7 +1519,7 @@ function SettingsView({
               value={calBookingUrl}
               onChange={(event) => setCalBookingUrl(event.target.value)}
               className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
-              placeholder="https://cal.com/..."
+              placeholder={siteConfig.bookingUrl}
             />
           </label>
 
