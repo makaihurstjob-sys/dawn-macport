@@ -16,7 +16,7 @@ function getRedirectPath() {
 }
 
 function getInviteCallbackState() {
-  if (typeof window === "undefined") return { isSetup: false, errorMessage: "" };
+  if (typeof window === "undefined") return { isSetup: false, errorMessage: "", successMessage: "" };
 
   const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
   const type = hashParams.get("type");
@@ -29,16 +29,22 @@ function getInviteCallbackState() {
       isSetup: false,
       errorMessage:
         "This invite link is invalid or has expired. Ask the coach to send a fresh invite.",
+      successMessage: "",
     };
   }
 
   if (errorDescription) {
-    return { isSetup: false, errorMessage: errorDescription };
+    return { isSetup: false, errorMessage: errorDescription, successMessage: "" };
   }
 
+  const isSetup = type === "invite" || type === "recovery";
+
   return {
-    isSetup: type === "invite" || type === "recovery",
+    isSetup,
     errorMessage: "",
+    successMessage: isSetup
+      ? "Verification successful. Your invitation was accepted. Create a password to finish setting up your client portal."
+      : "",
   };
 }
 
@@ -59,7 +65,10 @@ function CustomerLogin() {
     if (inviteCallback.errorMessage) {
       setError(inviteCallback.errorMessage);
     }
-  }, [inviteCallback.errorMessage]);
+    if (inviteCallback.successMessage) {
+      setLinkStatus(inviteCallback.successMessage);
+    }
+  }, [inviteCallback.errorMessage, inviteCallback.successMessage]);
 
   useEffect(() => {
     if (isSettingPassword) return;

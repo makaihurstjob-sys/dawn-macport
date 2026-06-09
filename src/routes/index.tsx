@@ -853,6 +853,20 @@ function Index() {
   const [showTestimonials, setShowTestimonials] = useState(false);
 
   useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+    const isAuthCallback =
+      hashParams.has("access_token") ||
+      hashParams.has("refresh_token") ||
+      hashParams.get("type") === "invite" ||
+      hashParams.get("type") === "recovery" ||
+      hashParams.has("error") ||
+      hashParams.has("error_code");
+
+    if (isAuthCallback) {
+      window.location.replace(`/customer-login${window.location.hash}`);
+      return;
+    }
+
     const loadSettings = async () => {
       const { data } = await supabase
         .from("site_settings")
