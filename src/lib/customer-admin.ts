@@ -10,9 +10,19 @@ type InviteCustomerInput = {
   courseId: string;
 };
 
+type DeleteDashboardNoteInput = {
+  accessToken: string;
+  noteId: string;
+};
+
+type DeleteBookingQualificationInput = {
+  accessToken: string;
+  bookingId: string;
+};
+
 function getPublicSiteUrl() {
   const configuredUrl = process.env.VITE_PUBLIC_SITE_URL?.trim();
-  return configuredUrl || "https://app.anewdawncoaching.org";
+  return configuredUrl || "https://anewdawncoaching.org";
 }
 
 function getSupabaseAuthClient(accessToken: string) {
@@ -112,4 +122,41 @@ export const inviteCustomerToCourse = createServerFn({ method: "POST" })
     }
 
     return { userId, email, fullName };
+  });
+
+export const deleteDashboardNote = createServerFn({ method: "POST" })
+  .inputValidator((input: DeleteDashboardNoteInput) => input)
+  .handler(async ({ data }) => {
+    if (!data.noteId) {
+      throw new Error("A dashboard note id is required.");
+    }
+
+    await assertAdminOrDeveloper(data.accessToken);
+
+    const { error } = await supabaseAdmin.from("dashboard_notes").delete().eq("id", data.noteId);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { deleted: true };
+  });
+
+export const deleteBookingQualification = createServerFn({ method: "POST" })
+  .inputValidator((input: DeleteBookingQualificationInput) => input)
+  .handler(async ({ data }) => {
+    if (!data.bookingId) {
+      throw new Error("A booking quiz entry id is required.");
+    }
+
+    await assertAdminOrDeveloper(data.accessToken);
+
+    const { error } = await supabaseAdmin
+      .from("booking_qualifications")
+      .delete()
+      .eq("id", data.bookingId);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { deleted: true };
   });

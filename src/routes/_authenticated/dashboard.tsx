@@ -26,7 +26,11 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
-import { inviteCustomerToCourse } from "@/lib/customer-admin";
+import {
+  deleteBookingQualification,
+  deleteDashboardNote,
+  inviteCustomerToCourse,
+} from "@/lib/customer-admin";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -277,17 +281,25 @@ function DashboardPage() {
 
     setDashboardError("");
 
-    const { data: deleted, error } = await supabase.rpc("delete_booking_qualification", {
-      _id: id,
-    });
-    if (error) {
-      setDashboardError(error.message);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setDashboardError("Log in again before deleting booking entries.");
       return;
     }
 
-    if (!deleted) {
+    try {
+      await deleteBookingQualification({
+        data: {
+          accessToken: session.access_token,
+          bookingId: id,
+        },
+      });
+    } catch (error) {
       setDashboardError(
-        "Supabase did not delete this booking entry. Run the latest dashboard delete migration, then try again.",
+        error instanceof Error ? error.message : "Booking quiz entry could not be deleted.",
       );
       return;
     }
@@ -300,17 +312,25 @@ function DashboardPage() {
 
     setDashboardError("");
 
-    const { data: deleted, error } = await supabase.rpc("delete_dashboard_note", {
-      _id: id,
-    });
-    if (error) {
-      setDashboardError(error.message);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setDashboardError("Log in again before deleting notes.");
       return;
     }
 
-    if (!deleted) {
+    try {
+      await deleteDashboardNote({
+        data: {
+          accessToken: session.access_token,
+          noteId: id,
+        },
+      });
+    } catch (error) {
       setDashboardError(
-        "Supabase did not delete this note. Run the latest dashboard delete migration, then try again.",
+        error instanceof Error ? error.message : "Dashboard note could not be deleted.",
       );
       return;
     }

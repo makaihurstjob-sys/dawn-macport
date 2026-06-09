@@ -14,10 +14,11 @@ import {
   Phone,
   Sprout,
   Sunrise,
-  UserRound,
+  X,
 } from "lucide-react";
 import wordmarkDarkSrc from "@/assets/brand/wordmark-dark.png";
 import navMarkSrc from "@/assets/brand/nav-mark.png";
+import coachPortraitSrc from "@/assets/brand/coach-portrait.jpeg";
 import { siteConfig } from "@/config/site";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -294,17 +295,12 @@ function About() {
           className="relative"
         >
           <div className="aspect-[4/5] overflow-hidden rounded-[2rem] border border-primary/20 bg-[linear-gradient(145deg,#fff7e9,#efd7cd_42%,#d6ddee)] shadow-[0_35px_90px_-55px_rgba(72,46,35,0.65)]">
-            <div className="flex h-full flex-col items-center justify-center px-10 text-center">
-              <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full border border-primary/25 bg-white/55 text-primary shadow-sm">
-                <UserRound className="h-10 w-10" />
-              </div>
-              <p className="text-xs font-bold uppercase tracking-[0.28em] text-primary/70">
-                Coach portrait placeholder
-              </p>
-              <p className="mt-5 max-w-xs text-sm leading-6 text-muted-foreground">
-                Replace this with an approved brand portrait when ready.
-              </p>
-            </div>
+            <img
+              src={coachPortraitSrc}
+              alt="A'New Dawn coach portrait"
+              className="h-full w-full object-cover object-[50%_35%]"
+              draggable={false}
+            />
           </div>
         </motion.div>
 
@@ -752,6 +748,7 @@ function Contact() {
 
 function FloatingCoachChat() {
   const [open, setOpen] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(true);
 
   return (
     <div className="fixed bottom-5 right-5 z-50 flex flex-col items-end gap-3">
@@ -800,13 +797,21 @@ function FloatingCoachChat() {
           </div>
         </motion.div>
       )}
-      {!open && (
+      {!open && showPrompt && (
         <motion.div
           initial={{ opacity: 0, y: 10, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="relative mr-1 max-w-[min(78vw,260px)] rounded-3xl bg-[#0a84ff] px-4 py-3 text-sm font-normal leading-5 text-white shadow-[0_20px_60px_-24px_rgba(10,132,255,0.85)] ring-1 ring-white/25"
+          className="group relative mr-1 max-w-[min(78vw,260px)] rounded-3xl bg-[#0a84ff] px-4 py-3 pr-8 text-sm font-normal leading-5 text-white shadow-[0_20px_60px_-24px_rgba(10,132,255,0.85)] ring-1 ring-white/25"
         >
           Welcome! Click me if you need any help!
+          <button
+            type="button"
+            onClick={() => setShowPrompt(false)}
+            className="absolute right-2 top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/16 text-white/80 opacity-0 transition hover:bg-white/24 hover:text-white group-hover:opacity-100"
+            aria-label="Hide chat message"
+          >
+            <X className="h-3 w-3" />
+          </button>
           <span className="absolute -bottom-1.5 right-7 h-4 w-4 rotate-45 bg-[#0a84ff]" />
         </motion.div>
       )}
