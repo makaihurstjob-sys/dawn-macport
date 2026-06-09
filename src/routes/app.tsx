@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, BookOpenCheck, LogOut, Sunrise } from "lucide-react";
+import navMarkSrc from "@/assets/brand/nav-mark.png";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/app")({
@@ -68,8 +69,20 @@ function CustomerApp() {
     <div className="min-h-screen bg-[#fff8ea] text-foreground">
       <header className="border-b border-border/70 bg-background/88 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <a href="/" className="font-serif text-2xl text-foreground">
-            A'New Dawn
+          <a
+            href="/"
+            className="flex min-w-0 shrink-0 items-center gap-3 text-[#4f332b]"
+            aria-label="A'New Dawn"
+          >
+            <img
+              src={navMarkSrc}
+              alt=""
+              className="h-9 w-auto max-w-[84px] shrink-0 object-contain sm:h-10 sm:max-w-[104px]"
+              draggable={false}
+            />
+            <span className="brand-script text-[1.5rem] font-normal leading-none text-[#4f332b]">
+              A&apos;New Dawn
+            </span>
           </a>
           <button
             type="button"
@@ -89,11 +102,10 @@ function CustomerApp() {
           </div>
           <p className="brand-kicker">Customer portal</p>
           <h1 className="mt-3 font-serif text-4xl leading-[1.06] text-foreground sm:text-5xl">
-            My Course
+            My Courses
           </h1>
           <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">
-            Your assigned A'New Dawn resources live here. QR links will bring you back to the right
-            course, but only your invited login controls access.
+            Your assigned A&apos;New Dawn resources live here.
           </p>
         </section>
 
