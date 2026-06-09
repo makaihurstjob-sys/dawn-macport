@@ -30,6 +30,7 @@ import {
   deleteBookingQualification,
   deleteDashboardNote,
   inviteCustomerToCourse,
+  removeCustomerCourseAccess,
 } from "@/lib/customer-admin";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
@@ -122,6 +123,7 @@ function DashboardPage() {
   const [qrStatus, setQrStatus] = useState("");
   const [customerStatus, setCustomerStatus] = useState("");
   const [invitingCustomer, setInvitingCustomer] = useState(false);
+  const [removingEnrollmentId, setRemovingEnrollmentId] = useState("");
   const [loading, setLoading] = useState(true);
   const [dashboardError, setDashboardError] = useState("");
 
@@ -466,6 +468,45 @@ function DashboardPage() {
     await refreshCustomerCourseData();
   };
 
+  const removeCustomerAccess = async (enrollment: CustomerEnrollment) => {
+    const customerName =
+      enrollment.profiles?.full_name || enrollment.profiles?.username || "this customer";
+    const courseTitle = enrollment.courses?.title || "this course";
+
+    if (!window.confirm(`Remove ${customerName}'s access to ${courseTitle}?`)) return;
+
+    setCustomerStatus("");
+    setDashboardError("");
+    setRemovingEnrollmentId(enrollment.id);
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setCustomerStatus("Log in again before removing customer access.");
+      setRemovingEnrollmentId("");
+      return;
+    }
+
+    try {
+      await removeCustomerCourseAccess({
+        data: {
+          accessToken: session.access_token,
+          enrollmentId: enrollment.id,
+        },
+      });
+      setCustomerStatus("Customer course access removed.");
+      await refreshCustomerCourseData();
+    } catch (error) {
+      setCustomerStatus(
+        error instanceof Error ? error.message : "Customer access could not be removed.",
+      );
+    } finally {
+      setRemovingEnrollmentId("");
+    }
+  };
+
   const copyText = async (value: string) => {
     await navigator.clipboard.writeText(value);
     setQrStatus("Copied.");
@@ -566,12 +607,14 @@ function DashboardPage() {
               setSelectedCourseId={setSelectedCourseId}
               customerStatus={customerStatus}
               invitingCustomer={invitingCustomer}
+              removingEnrollmentId={removingEnrollmentId}
               inviteCustomer={inviteCustomer}
               qrSlug={qrSlug}
               setQrSlug={setQrSlug}
               qrStatus={qrStatus}
               createQrLink={createQrLink}
               toggleQrLink={toggleQrLink}
+              removeCustomerAccess={removeCustomerAccess}
               copyText={copyText}
             />
           )}
@@ -883,11 +926,11 @@ function IntakeView({ intakes }: { intakes: IntakeSubmission[] }) {
 }
 
 function getCustomerAppBaseUrl() {
-  if (typeof window === "undefined") return "https://app.anewdawncoaching.org";
+  if (typeof window === "undefined") return "https://anewdawncoaching.org";
   if (window.location.hostname.includes("localhost") || window.location.hostname.includes("127.0.0.1")) {
     return window.location.origin;
   }
-  return "https://app.anewdawncoaching.org";
+  return "https://anewdawncoaching.org";
 }
 
 function getQrUrl(slug: string) {
@@ -914,12 +957,14 @@ function CustomersCoursesView({
   setSelectedCourseId,
   customerStatus,
   invitingCustomer,
+  removingEnrollmentId,
   inviteCustomer,
   qrSlug,
   setQrSlug,
   qrStatus,
   createQrLink,
   toggleQrLink,
+  removeCustomerAccess,
   copyText,
 }: {
   courses: Course[];
@@ -935,12 +980,14 @@ function CustomersCoursesView({
   setSelectedCourseId: (value: string) => void;
   customerStatus: string;
   invitingCustomer: boolean;
+  removingEnrollmentId: string;
   inviteCustomer: () => void;
   qrSlug: string;
   setQrSlug: (value: string) => void;
   qrStatus: string;
   createQrLink: () => void;
   toggleQrLink: (qrLink: QrLink) => void;
+  removeCustomerAccess: (enrollment: CustomerEnrollment) => void;
   copyText: (value: string) => void;
 }) {
   const completedByCustomer = useMemo(() => {
@@ -1037,7 +1084,7 @@ function CustomersCoursesView({
 
           <div className="grid gap-4 md:grid-cols-[1fr_0.9fr]">
             <label className="block text-sm font-semibold text-foreground">
-              QR slug
+              Short link name
               <input
                 type="text"
                 value={qrSlug}
@@ -1110,9 +1157,17 @@ function CustomersCoursesView({
                       {customerEnrollments.map((enrollment) => (
                         <span
                           key={enrollment.id}
-                          className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"
+                          className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground"
                         >
                           {enrollment.courses?.title || "Course"} - {enrollment.status}
+                          <button
+                            type="button"
+                            onClick={() => removeCustomerAccess(enrollment)}
+                            disabled={removingEnrollmentId === enrollment.id}
+                            className="rounded-full bg-background/80 px-2 py-0.5 text-[11px] font-bold text-destructive transition hover:bg-destructive hover:text-destructive-foreground disabled:cursor-wait disabled:opacity-60"
+                          >
+                            {removingEnrollmentId === enrollment.id ? "Removing..." : "Remove access"}
+                          </button>
                         </span>
                       ))}
                     </div>

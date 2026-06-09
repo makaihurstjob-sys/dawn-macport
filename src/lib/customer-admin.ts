@@ -20,6 +20,11 @@ type DeleteBookingQualificationInput = {
   bookingId: string;
 };
 
+type RemoveCustomerCourseAccessInput = {
+  accessToken: string;
+  enrollmentId: string;
+};
+
 function getPublicSiteUrl() {
   const configuredUrl = process.env.VITE_PUBLIC_SITE_URL?.trim();
   return configuredUrl || "https://anewdawncoaching.org";
@@ -159,4 +164,24 @@ export const deleteBookingQualification = createServerFn({ method: "POST" })
     }
 
     return { deleted: true };
+  });
+
+export const removeCustomerCourseAccess = createServerFn({ method: "POST" })
+  .inputValidator((input: RemoveCustomerCourseAccessInput) => input)
+  .handler(async ({ data }) => {
+    if (!data.enrollmentId) {
+      throw new Error("A customer course enrollment id is required.");
+    }
+
+    await assertAdminOrDeveloper(data.accessToken);
+
+    const { error } = await supabaseAdmin
+      .from("customer_enrollments")
+      .delete()
+      .eq("id", data.enrollmentId);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { removed: true };
   });
