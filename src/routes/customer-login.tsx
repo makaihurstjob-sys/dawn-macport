@@ -179,46 +179,36 @@ function CustomerLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#fff8ea_0%,#f7d6a3_38%,#f1a56e_64%,#fff8ea_100%)] text-foreground">
-      <main className="relative mx-auto flex min-h-screen max-w-5xl flex-col px-4 py-7 sm:px-6">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#fffaf2_0%,#fae4b7_40%,#f1ad78_72%,#fff0dc_100%)] text-foreground">
+      <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-7 sm:px-6">
         <a
           href="/"
-          className="mb-8 inline-flex w-fit items-center gap-2 rounded-full border border-white/55 bg-white/35 px-4 py-2 text-sm font-medium text-[#51372f] shadow-sm backdrop-blur transition hover:bg-white/55"
+          className="inline-flex w-fit items-center gap-2 rounded-full border border-white/75 bg-white/45 px-4 py-2 text-sm font-medium text-[#51372f] shadow-sm backdrop-blur transition hover:bg-white/70"
         >
           <ArrowLeft className="h-4 w-4" />
           Home
         </a>
 
-        <section className="flex flex-1 items-center justify-center py-8">
-          <div className="grid w-full max-w-4xl overflow-hidden rounded-2xl border border-white/70 bg-[#fffaf1]/90 shadow-[0_36px_120px_-65px_rgba(94,55,33,0.86)] backdrop-blur-xl md:grid-cols-[0.9fr_1.1fr]">
-            <div className="border-b border-[#e7cda9]/70 bg-[linear-gradient(155deg,rgba(255,250,241,0.98)_0%,rgba(255,236,197,0.92)_55%,rgba(242,155,44,0.24)_100%)] p-8 text-[#4f332b] md:border-b-0 md:border-r sm:p-10">
-              <div className="mb-12 flex items-center gap-3">
+        <section className="flex flex-1 items-center justify-center py-10 sm:py-14">
+          <div className="relative w-full max-w-[560px] before:absolute before:inset-x-4 before:top-4 before:-bottom-4 before:bg-[#e89e5e]/20 before:content-[''] sm:before:inset-x-5 sm:before:top-5 sm:before:-bottom-5">
+            <form
+              onSubmit={isSettingPassword ? handlePasswordSetup : handleLogin}
+              className="relative rounded-[1.65rem] border border-white/75 bg-[#fffaf1]/92 px-6 py-8 shadow-[0_34px_100px_-65px_rgba(94,55,33,0.9)] backdrop-blur-xl sm:px-8 sm:py-10"
+            >
+              <div className="mx-auto mb-2 flex w-fit items-center gap-3 bg-[#fff7e7]/80 px-4 py-3">
                 <img
                   src={navMarkSrc}
                   alt=""
-                  className="h-12 w-auto max-w-[116px] object-contain"
+                  className="h-10 w-auto max-w-[96px] object-contain"
                   draggable={false}
                 />
-                <span className="brand-script text-[1.7rem] leading-none text-[#4f332b]">
+                <span className="brand-script text-[1.45rem] leading-none text-[#4f332b]">
                   A&apos;New Dawn
                 </span>
               </div>
-              <h1 className="font-serif text-4xl leading-[1.06] text-[#4f332b]">
-                Continue your course path.
+              <h1 className="mb-6 text-center font-serif text-4xl leading-tight text-[#4f332b]">
+                {isSettingPassword ? "Create Password" : "Login"}
               </h1>
-            </div>
-
-            <form
-              onSubmit={isSettingPassword ? handlePasswordSetup : handleLogin}
-              className="p-6 sm:p-10"
-            >
-              <div className="mb-7 flex items-center gap-3">
-                <div>
-                  <h2 className="font-serif text-3xl text-foreground">
-                    {isSettingPassword ? "Create Password" : "Login"}
-                  </h2>
-                </div>
-              </div>
 
               {error && (
                 <div className="mb-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
@@ -241,7 +231,7 @@ function CustomerLogin() {
                       autoComplete="new-password"
                       value={newPassword}
                       onChange={(event) => setNewPassword(event.target.value)}
-                      className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                      className="mt-2 w-full rounded-xl border border-[#e7d9c5] bg-white/80 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                     />
                   </label>
 
@@ -253,7 +243,7 @@ function CustomerLogin() {
                       autoComplete="new-password"
                       value={confirmPassword}
                       onChange={(event) => setConfirmPassword(event.target.value)}
-                      className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                      className="mt-2 w-full rounded-xl border border-[#e7d9c5] bg-white/80 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                     />
                   </label>
                 </>
@@ -267,7 +257,7 @@ function CustomerLogin() {
                       autoComplete="username"
                       value={email}
                       onChange={(event) => setEmail(event.target.value)}
-                      className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                      className="mt-2 w-full rounded-xl border border-[#e7d9c5] bg-white/80 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                     />
                   </label>
 
@@ -279,7 +269,7 @@ function CustomerLogin() {
                       autoComplete="current-password"
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
-                      className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                      className="mt-2 w-full rounded-xl border border-[#e7d9c5] bg-white/80 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                     />
                   </label>
                 </>
@@ -303,7 +293,7 @@ function CustomerLogin() {
                 <button
                   type="button"
                   onClick={sendLoginLink}
-                  className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-border bg-background px-5 py-3 font-medium text-foreground transition hover:bg-muted"
+                  className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-[#e7d9c5] bg-[#fffdf7] px-5 py-3 font-medium text-foreground transition hover:bg-muted"
                 >
                   Email me a secure login link
                 </button>
