@@ -44,13 +44,13 @@ const stagger: Variants = {
 };
 
 function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
-  const links = [
+  const links: Array<{ label: string; href: string; external?: boolean }> = [
     { label: "Home", href: "#home" },
     { label: "About", href: "#about" },
     { label: "Coaching", href: "#coaching" },
     ...(showTestimonials ? [{ label: "Testimonials", href: "#testimonials" }] : []),
     { label: "Contact", href: "#contact" },
-    { label: "Client Portal", href: "/customer-login" },
+    { label: "Client Portal", href: "/customer-login", external: true },
   ];
 
   return (
@@ -74,7 +74,13 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
 
         <div className="hidden items-center gap-7 text-sm font-semibold text-white/66 md:flex">
           {links.map((link) => (
-            <a key={link.href} href={link.href} className="transition-colors hover:text-white">
+            <a
+              key={link.href}
+              href={link.href}
+              target={link.external ? "_blank" : undefined}
+              rel={link.external ? "noreferrer" : undefined}
+              className="transition-colors hover:text-white"
+            >
               {link.label}
             </a>
           ))}
