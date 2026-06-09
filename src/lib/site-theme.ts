@@ -1,8 +1,16 @@
 export type WebsiteThemeMode = "light" | "dark" | "system";
 
+export const WEBSITE_THEME_SETTING_KEY = "website_theme_mode";
+export const DASHBOARD_THEME_SETTING_KEY = "dashboard_theme_mode";
+
 export function normalizeWebsiteThemeMode(value?: string | null): WebsiteThemeMode {
   if (value === "light" || value === "dark" || value === "system") return value;
   return "system";
+}
+
+export function getThemeSettingKeyForPath(pathname: string) {
+  if (pathname.startsWith("/dashboard")) return DASHBOARD_THEME_SETTING_KEY;
+  return WEBSITE_THEME_SETTING_KEY;
 }
 
 function systemPrefersDark() {

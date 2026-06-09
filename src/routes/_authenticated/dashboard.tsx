@@ -38,7 +38,9 @@ import {
 } from "@/lib/customer-admin";
 import {
   applyWebsiteThemeMode,
+  DASHBOARD_THEME_SETTING_KEY,
   normalizeWebsiteThemeMode,
+  WEBSITE_THEME_SETTING_KEY,
   type WebsiteThemeMode,
 } from "@/lib/site-theme";
 
@@ -135,6 +137,7 @@ function DashboardPage() {
   const [calBookingUrl, setCalBookingUrl] = useState("");
   const [testimonialsEnabled, setTestimonialsEnabled] = useState(false);
   const [websiteThemeMode, setWebsiteThemeMode] = useState<WebsiteThemeMode>("system");
+  const [dashboardThemeMode, setDashboardThemeMode] = useState<WebsiteThemeMode>("system");
   const [settingsStatus, setSettingsStatus] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -238,10 +241,14 @@ function DashboardPage() {
               "true",
           );
           const savedThemeMode = normalizeWebsiteThemeMode(
-            settingsData?.find((setting) => setting.key === "website_theme_mode")?.value,
+            settingsData?.find((setting) => setting.key === WEBSITE_THEME_SETTING_KEY)?.value,
           );
           setWebsiteThemeMode(savedThemeMode);
-          applyWebsiteThemeMode(savedThemeMode);
+          const savedDashboardThemeMode = normalizeWebsiteThemeMode(
+            settingsData?.find((setting) => setting.key === DASHBOARD_THEME_SETTING_KEY)?.value,
+          );
+          setDashboardThemeMode(savedDashboardThemeMode);
+          applyWebsiteThemeMode(savedDashboardThemeMode);
         }
       } catch (error) {
         setDashboardError(error instanceof Error ? error.message : "Dashboard data unavailable.");
@@ -453,12 +460,11 @@ function DashboardPage() {
   const saveWebsiteThemeMode = async (mode: WebsiteThemeMode) => {
     setSettingsStatus("");
     setWebsiteThemeMode(mode);
-    applyWebsiteThemeMode(mode);
 
     const { data, error } = await supabase
       .from("site_settings")
       .upsert({
-        key: "website_theme_mode",
+        key: WEBSITE_THEME_SETTING_KEY,
         value: mode,
         updated_at: new Date().toISOString(),
       })
@@ -473,12 +479,43 @@ function DashboardPage() {
     if (data) {
       setSettings((current) => [
         data,
-        ...current.filter((setting) => setting.key !== "website_theme_mode"),
+        ...current.filter((setting) => setting.key !== WEBSITE_THEME_SETTING_KEY),
       ]);
     }
 
     const label = mode === "system" ? "System" : mode === "dark" ? "Dark" : "Light";
     setSettingsStatus(`Website theme set to ${label}.`);
+  };
+
+  const saveDashboardThemeMode = async (mode: WebsiteThemeMode) => {
+    setSettingsStatus("");
+    setDashboardThemeMode(mode);
+    applyWebsiteThemeMode(mode);
+
+    const { data, error } = await supabase
+      .from("site_settings")
+      .upsert({
+        key: DASHBOARD_THEME_SETTING_KEY,
+        value: mode,
+        updated_at: new Date().toISOString(),
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      setSettingsStatus(error.message);
+      return;
+    }
+
+    if (data) {
+      setSettings((current) => [
+        data,
+        ...current.filter((setting) => setting.key !== DASHBOARD_THEME_SETTING_KEY),
+      ]);
+    }
+
+    const label = mode === "system" ? "System" : mode === "dark" ? "Dark" : "Light";
+    setSettingsStatus(`Dashboard theme set to ${label}.`);
   };
 
   const inviteCustomer = async () => {
@@ -600,7 +637,7 @@ function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f0e7] text-foreground">
+    <div className="min-h-screen bg-background text-foreground">
       <div className="flex min-h-screen flex-col lg:flex-row">
         <aside className="border-b border-border bg-background/90 p-4 backdrop-blur lg:w-72 lg:border-b-0 lg:border-r lg:p-6">
           <div className="mb-6 flex items-center justify-between lg:block">
@@ -721,6 +758,8 @@ function DashboardPage() {
               saveTestimonialsEnabled={saveTestimonialsEnabled}
               websiteThemeMode={websiteThemeMode}
               saveWebsiteThemeMode={saveWebsiteThemeMode}
+              dashboardThemeMode={dashboardThemeMode}
+              saveDashboardThemeMode={saveDashboardThemeMode}
               settingsStatus={settingsStatus}
             />
           )}
@@ -1127,7 +1166,7 @@ function CustomersCoursesView({
                 type="text"
                 value={customerName}
                 onChange={(event) => setCustomerName(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                 placeholder="Novel Allen"
               />
             </label>
@@ -1137,7 +1176,7 @@ function CustomersCoursesView({
                 type="email"
                 value={customerEmail}
                 onChange={(event) => setCustomerEmail(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                 placeholder="customer@example.com"
               />
             </label>
@@ -1146,7 +1185,7 @@ function CustomersCoursesView({
               <select
                 value={selectedCourseId}
                 onChange={(event) => setSelectedCourseId(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
               >
                 {courses.map((course) => (
                   <option key={course.id} value={course.id}>
@@ -1196,7 +1235,7 @@ function CustomersCoursesView({
                 type="text"
                 value={qrSlug}
                 onChange={(event) => setQrSlug(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                 placeholder="dawn-method"
               />
             </label>
@@ -1205,7 +1244,7 @@ function CustomersCoursesView({
               <select
                 value={selectedCourseId}
                 onChange={(event) => setSelectedCourseId(event.target.value)}
-                className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
               >
                 {courses.map((course) => (
                   <option key={course.id} value={course.id}>
@@ -1390,7 +1429,7 @@ function NotesView({
           value={noteText}
           onChange={(event) => setNoteText(event.target.value)}
           rows={7}
-          className="mt-5 w-full resize-none rounded-xl border border-border bg-white/70 px-4 py-3 outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+          className="mt-5 w-full resize-none rounded-xl border border-border bg-card px-4 py-3 outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
           placeholder="Write a private dashboard note..."
         />
         <button
@@ -1440,6 +1479,8 @@ function SettingsView({
   saveTestimonialsEnabled,
   websiteThemeMode,
   saveWebsiteThemeMode,
+  dashboardThemeMode,
+  saveDashboardThemeMode,
   settingsStatus,
 }: {
   calBookingUrl: string;
@@ -1449,6 +1490,8 @@ function SettingsView({
   saveTestimonialsEnabled: (enabled: boolean) => void;
   websiteThemeMode: WebsiteThemeMode;
   saveWebsiteThemeMode: (mode: WebsiteThemeMode) => void;
+  dashboardThemeMode: WebsiteThemeMode;
+  saveDashboardThemeMode: (mode: WebsiteThemeMode) => void;
   settingsStatus: string;
 }) {
   return (
@@ -1473,7 +1516,7 @@ function SettingsView({
               type="url"
               value={calBookingUrl}
               onChange={(event) => setCalBookingUrl(event.target.value)}
-              className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+              className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
               placeholder="https://cal.com/..."
             />
           </label>
@@ -1527,9 +1570,9 @@ function SettingsView({
             </div>
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                Website appearance
+                Public website
               </p>
-              <h3 className="font-serif text-2xl text-foreground">Theme mode</h3>
+              <h3 className="font-serif text-2xl text-foreground">Website theme</h3>
             </div>
           </div>
 
@@ -1542,6 +1585,43 @@ function SettingsView({
                   key={option.value}
                   type="button"
                   onClick={() => saveWebsiteThemeMode(option.value)}
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                    active
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                  }`}
+                  aria-pressed={active}
+                >
+                  <Icon className="h-4 w-4" />
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Monitor className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                Admin dashboard
+              </p>
+              <h3 className="font-serif text-2xl text-foreground">Dashboard theme</h3>
+            </div>
+          </div>
+
+          <div className="grid gap-2 rounded-2xl bg-muted/55 p-2 sm:grid-cols-3">
+            {websiteThemeOptions.map((option) => {
+              const Icon = option.icon;
+              const active = dashboardThemeMode === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => saveDashboardThemeMode(option.value)}
                   className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition ${
                     active
                       ? "bg-background text-foreground shadow-sm"
