@@ -14,10 +14,13 @@ import {
   LogOut,
   Mail,
   MessageSquareText,
+  Monitor,
+  Moon,
   NotebookPen,
   Phone,
   Save,
   Settings,
+  Sun,
   Trash2,
   UserPlus,
   UserRoundCheck,
@@ -33,6 +36,11 @@ import {
   inviteCustomerToCourse,
   removeCustomerCourseAccess,
 } from "@/lib/customer-admin";
+import {
+  applyWebsiteThemeMode,
+  normalizeWebsiteThemeMode,
+  type WebsiteThemeMode,
+} from "@/lib/site-theme";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
@@ -71,6 +79,16 @@ const navItems: Array<{ id: View; label: string; icon: typeof Home; developerOnl
   { id: "notes", label: "Notes", icon: NotebookPen },
   { id: "settings", label: "Settings", icon: Settings },
   { id: "developer", label: "Developer", icon: Code2, developerOnly: true },
+];
+
+const websiteThemeOptions: Array<{
+  value: WebsiteThemeMode;
+  label: string;
+  icon: typeof Sun;
+}> = [
+  { value: "light", label: "Light", icon: Sun },
+  { value: "dark", label: "Dark", icon: Moon },
+  { value: "system", label: "System", icon: Monitor },
 ];
 
 function statusTone(status?: string | null) {
@@ -116,6 +134,7 @@ function DashboardPage() {
   const [noteText, setNoteText] = useState("");
   const [calBookingUrl, setCalBookingUrl] = useState("");
   const [testimonialsEnabled, setTestimonialsEnabled] = useState(false);
+  const [websiteThemeMode, setWebsiteThemeMode] = useState<WebsiteThemeMode>("system");
   const [settingsStatus, setSettingsStatus] = useState("");
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
@@ -218,6 +237,11 @@ function DashboardPage() {
             settingsData?.find((setting) => setting.key === "testimonials_enabled")?.value ===
               "true",
           );
+          const savedThemeMode = normalizeWebsiteThemeMode(
+            settingsData?.find((setting) => setting.key === "website_theme_mode")?.value,
+          );
+          setWebsiteThemeMode(savedThemeMode);
+          applyWebsiteThemeMode(savedThemeMode);
         }
       } catch (error) {
         setDashboardError(error instanceof Error ? error.message : "Dashboard data unavailable.");
@@ -424,6 +448,37 @@ function DashboardPage() {
       ]);
     }
     setSettingsStatus(enabled ? "Testimonials are visible." : "Testimonials are hidden.");
+  };
+
+  const saveWebsiteThemeMode = async (mode: WebsiteThemeMode) => {
+    setSettingsStatus("");
+    setWebsiteThemeMode(mode);
+    applyWebsiteThemeMode(mode);
+
+    const { data, error } = await supabase
+      .from("site_settings")
+      .upsert({
+        key: "website_theme_mode",
+        value: mode,
+        updated_at: new Date().toISOString(),
+      })
+      .select("*")
+      .single();
+
+    if (error) {
+      setSettingsStatus(error.message);
+      return;
+    }
+
+    if (data) {
+      setSettings((current) => [
+        data,
+        ...current.filter((setting) => setting.key !== "website_theme_mode"),
+      ]);
+    }
+
+    const label = mode === "system" ? "System" : mode === "dark" ? "Dark" : "Light";
+    setSettingsStatus(`Website theme set to ${label}.`);
   };
 
   const inviteCustomer = async () => {
@@ -664,6 +719,8 @@ function DashboardPage() {
               saveCalBookingUrl={saveCalBookingUrl}
               testimonialsEnabled={testimonialsEnabled}
               saveTestimonialsEnabled={saveTestimonialsEnabled}
+              websiteThemeMode={websiteThemeMode}
+              saveWebsiteThemeMode={saveWebsiteThemeMode}
               settingsStatus={settingsStatus}
             />
           )}
@@ -1381,6 +1438,8 @@ function SettingsView({
   saveCalBookingUrl,
   testimonialsEnabled,
   saveTestimonialsEnabled,
+  websiteThemeMode,
+  saveWebsiteThemeMode,
   settingsStatus,
 }: {
   calBookingUrl: string;
@@ -1388,6 +1447,8 @@ function SettingsView({
   saveCalBookingUrl: () => void;
   testimonialsEnabled: boolean;
   saveTestimonialsEnabled: (enabled: boolean) => void;
+  websiteThemeMode: WebsiteThemeMode;
+  saveWebsiteThemeMode: (mode: WebsiteThemeMode) => void;
   settingsStatus: string;
 }) {
   return (
@@ -1457,6 +1518,43 @@ function SettingsView({
           <p className="rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">
             Current status: {testimonialsEnabled ? "Visible on homepage" : "Hidden on homepage"}
           </p>
+        </div>
+
+        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+          <div className="mb-5 flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Sun className="h-5 w-5" />
+            </div>
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                Website appearance
+              </p>
+              <h3 className="font-serif text-2xl text-foreground">Theme mode</h3>
+            </div>
+          </div>
+
+          <div className="grid gap-2 rounded-2xl bg-muted/55 p-2 sm:grid-cols-3">
+            {websiteThemeOptions.map((option) => {
+              const Icon = option.icon;
+              const active = websiteThemeMode === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  onClick={() => saveWebsiteThemeMode(option.value)}
+                  className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                    active
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                  }`}
+                  aria-pressed={active}
+                >
+                  <Icon className="h-4 w-4" />
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         {settingsStatus && (

@@ -7,8 +7,11 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { type ReactNode, useEffect } from "react";
 
 import appCss from "../styles.css?url";
+import { normalizeWebsiteThemeMode, watchWebsiteThemeMode } from "@/lib/site-theme";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -135,7 +138,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   errorComponent: ErrorComponent,
 });
 
-function RootShell({ children }: { children: React.ReactNode }) {
+function RootShell({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <head>
@@ -151,6 +154,30 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    let cleanupThemeWatcher = () => {};
+    let mounted = true;
+
+    const loadThemeMode = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "website_theme_mode")
+        .maybeSingle();
+
+      if (!mounted) return;
+      cleanupThemeWatcher();
+      cleanupThemeWatcher = watchWebsiteThemeMode(normalizeWebsiteThemeMode(data?.value));
+    };
+
+    void loadThemeMode();
+
+    return () => {
+      mounted = false;
+      cleanupThemeWatcher();
+    };
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

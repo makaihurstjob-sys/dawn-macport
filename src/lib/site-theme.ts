@@ -1,0 +1,35 @@
+export type WebsiteThemeMode = "light" | "dark" | "system";
+
+export function normalizeWebsiteThemeMode(value?: string | null): WebsiteThemeMode {
+  if (value === "light" || value === "dark" || value === "system") return value;
+  return "system";
+}
+
+function systemPrefersDark() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches
+  );
+}
+
+export function applyWebsiteThemeMode(mode: WebsiteThemeMode) {
+  if (typeof document === "undefined") return;
+
+  const shouldUseDark = mode === "dark" || (mode === "system" && systemPrefersDark());
+  document.documentElement.classList.toggle("dark", shouldUseDark);
+  document.documentElement.dataset.themeMode = mode;
+}
+
+export function watchWebsiteThemeMode(mode: WebsiteThemeMode) {
+  applyWebsiteThemeMode(mode);
+
+  if (typeof window === "undefined" || mode !== "system") {
+    return () => {};
+  }
+
+  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  const handleSystemChange = () => applyWebsiteThemeMode("system");
+  mediaQuery.addEventListener("change", handleSystemChange);
+
+  return () => mediaQuery.removeEventListener("change", handleSystemChange);
+}
