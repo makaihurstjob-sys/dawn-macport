@@ -20,6 +20,11 @@ type DeleteBookingQualificationInput = {
   bookingId: string;
 };
 
+type DeleteIntakeSubmissionInput = {
+  accessToken: string;
+  intakeId: string;
+};
+
 type RemoveCustomerCourseAccessInput = {
   accessToken: string;
   enrollmentId: string;
@@ -159,6 +164,26 @@ export const deleteBookingQualification = createServerFn({ method: "POST" })
       .from("booking_qualifications")
       .delete()
       .eq("id", data.bookingId);
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    return { deleted: true };
+  });
+
+export const deleteIntakeSubmission = createServerFn({ method: "POST" })
+  .inputValidator((input: DeleteIntakeSubmissionInput) => input)
+  .handler(async ({ data }) => {
+    if (!data.intakeId) {
+      throw new Error("A survey entry id is required.");
+    }
+
+    await assertAdminOrDeveloper(data.accessToken);
+
+    const { error } = await supabaseAdmin
+      .from("intake_submissions")
+      .delete()
+      .eq("id", data.intakeId);
     if (error) {
       throw new Error(error.message);
     }

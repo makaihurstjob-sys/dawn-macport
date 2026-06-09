@@ -29,6 +29,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import {
   deleteBookingQualification,
   deleteDashboardNote,
+  deleteIntakeSubmission,
   inviteCustomerToCourse,
   removeCustomerCourseAccess,
 } from "@/lib/customer-admin";
@@ -310,6 +311,37 @@ function DashboardPage() {
     setBookings((current) => current.filter((booking) => booking.id !== id));
   };
 
+  const deleteIntake = async (id: string) => {
+    if (!window.confirm("Delete this survey entry?")) return;
+
+    setDashboardError("");
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.access_token) {
+      setDashboardError("Log in again before deleting survey entries.");
+      return;
+    }
+
+    try {
+      await deleteIntakeSubmission({
+        data: {
+          accessToken: session.access_token,
+          intakeId: id,
+        },
+      });
+    } catch (error) {
+      setDashboardError(
+        error instanceof Error ? error.message : "Survey entry could not be deleted.",
+      );
+      return;
+    }
+
+    setIntakes((current) => current.filter((intake) => intake.id !== id));
+  };
+
   const deleteNote = async (id: string) => {
     if (!window.confirm("Delete this dashboard note?")) return;
 
@@ -573,9 +605,7 @@ function DashboardPage() {
                   : navItems.find((item) => item.id === activeView)?.label}
               </h2>
             </div>
-            <p className="text-sm text-muted-foreground">
-              {loading ? "Loading dashboard..." : "Latest data from Supabase"}
-            </p>
+            {loading && <p className="text-sm text-muted-foreground">Loading dashboard...</p>}
           </header>
 
           {dashboardError && (
@@ -591,7 +621,7 @@ function DashboardPage() {
           {activeView === "bookings" && (
             <BookingsView bookings={bookings} deleteBooking={deleteBooking} />
           )}
-          {activeView === "intake" && <IntakeView intakes={intakes} />}
+          {activeView === "intake" && <IntakeView intakes={intakes} deleteIntake={deleteIntake} />}
           {activeView === "customers" && (
             <CustomersCoursesView
               courses={courses}
@@ -866,7 +896,13 @@ function BookingsView({
   );
 }
 
-function IntakeView({ intakes }: { intakes: IntakeSubmission[] }) {
+function IntakeView({
+  intakes,
+  deleteIntake,
+}: {
+  intakes: IntakeSubmission[];
+  deleteIntake: (id: string) => void;
+}) {
   return (
     <section className="space-y-4">
       {intakes.length === 0 ? (
@@ -885,11 +921,25 @@ function IntakeView({ intakes }: { intakes: IntakeSubmission[] }) {
                     {intake.result_type || intake.struggle_area} - {formatDate(intake.created_at)}
                   </p>
                 </div>
-                <span
-                  className={`w-fit rounded-full px-3 py-1 text-xs font-bold ${statusTone(intake.status)}`}
-                >
-                  {intake.status || "New"}
-                </span>
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`w-fit rounded-full px-3 py-1 text-xs font-bold ${statusTone(intake.status)}`}
+                  >
+                    {intake.status || "New"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.preventDefault();
+                      event.stopPropagation();
+                      deleteIntake(intake.id);
+                    }}
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-destructive/10 text-destructive transition hover:bg-destructive hover:text-destructive-foreground"
+                    aria-label={`Delete survey entry for ${intake.email}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </summary>
             <div className="mt-6 grid gap-4 md:grid-cols-2">
