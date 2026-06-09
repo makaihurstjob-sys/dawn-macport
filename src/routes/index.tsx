@@ -764,13 +764,13 @@ function FloatingCoachChat() {
           initial={{ opacity: 0, y: 18, scale: 0.96 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 18, scale: 0.96 }}
-          className="w-[min(92vw,360px)] overflow-hidden rounded-2xl border border-border/70 bg-background shadow-[0_28px_100px_-52px_rgba(36,31,44,0.8)]"
+          className="w-[min(92vw,360px)] overflow-hidden rounded-2xl border border-[#ead8bd] bg-background shadow-[0_28px_100px_-52px_rgba(95,59,36,0.55)]"
         >
-          <div className="bg-[#241f2f] p-5 text-white">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#f6cf8d]">
+          <div className="border-b border-[#ead8bd] bg-[#fff4df] p-5 text-[#4f332b]">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary">
               A'New Dawn assistant
             </p>
-            <h3 className="mt-2 font-serif text-2xl text-[#fff8ea]">How can we help?</h3>
+            <h3 className="mt-2 font-serif text-2xl text-[#4f332b]">How can we help?</h3>
           </div>
           <div className="space-y-3 p-5">
             <p className="rounded-xl bg-muted p-4 text-sm leading-6 text-muted-foreground">
@@ -808,7 +808,7 @@ function FloatingCoachChat() {
         <motion.div
           initial={{ opacity: 0, y: 10, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          className="group relative mr-1 max-w-[min(78vw,260px)] rounded-3xl bg-[#0a84ff] px-4 py-3 pr-8 text-sm font-normal leading-5 text-white shadow-[0_20px_60px_-24px_rgba(10,132,255,0.85)] ring-1 ring-white/25"
+          className="group relative mr-1 max-w-[min(78vw,260px)] rounded-3xl bg-[#9b643b] px-4 py-3 pr-8 text-sm font-normal leading-5 text-white shadow-[0_20px_60px_-24px_rgba(92,54,30,0.72)]"
         >
           Welcome! Click me if you need any help!
           <button
@@ -819,13 +819,13 @@ function FloatingCoachChat() {
           >
             <X className="h-3 w-3" />
           </button>
-          <span className="absolute -bottom-1.5 right-7 h-4 w-4 rotate-45 bg-[#0a84ff]" />
+          <span className="absolute -bottom-1.5 right-7 h-4 w-4 rotate-45 bg-[#9b643b]" />
         </motion.div>
       )}
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(135deg,#fff2c9_0%,#f6b24a_46%,#e9862d_100%)] text-[#241f2f] shadow-[0_22px_70px_-22px_rgba(233,134,45,0.95)] ring-2 ring-white/70 transition hover:-translate-y-0.5 hover:shadow-[0_26px_80px_-22px_rgba(233,134,45,1)]"
+        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-[0_22px_70px_-22px_rgba(233,134,45,0.9)] transition hover:-translate-y-0.5 hover:bg-[#db6f23] hover:shadow-[0_26px_80px_-22px_rgba(233,134,45,0.95)]"
         aria-label={open ? "Close A'New Dawn assistant" : "Open A'New Dawn assistant"}
       >
         <MessageCircleHeart className="h-6 w-6" />
