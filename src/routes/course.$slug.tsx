@@ -1,23 +1,13 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, Check, Circle, LogOut, Route as RouteIcon } from "lucide-react";
+import { getCustomerAuthState } from "@/lib/customer-auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/course/$slug")({
   beforeLoad: async ({ params }) => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw redirect({
-        to: "/customer-login",
-        search: { redirect: `/course/${params.slug}` },
-      });
-    }
-
-    const { data: profile } = await supabase.from("profiles").select("role").single();
-    if (profile?.role !== "customer") {
+    const { isCustomer } = await getCustomerAuthState();
+    if (!isCustomer) {
       throw redirect({
         to: "/customer-login",
         search: { redirect: `/course/${params.slug}` },
@@ -62,12 +52,14 @@ function CoursePage() {
       setLoading(true);
       setError("");
 
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { isCustomer, userId: customerId } = await getCustomerAuthState();
 
-      if (!user) return;
-      setUserId(user.id);
+      if (!isCustomer || !customerId) {
+        setError("Sign in again to open this course.");
+        setLoading(false);
+        return;
+      }
+      setUserId(customerId);
 
       const { data: courseData, error: courseError } = await supabase
         .from("courses")
@@ -93,7 +85,7 @@ function CoursePage() {
         .from("course_progress")
         .select("id,item_key,completed")
         .eq("course_id", normalizedCourse.id)
-        .eq("customer_id", user.id);
+        .eq("customer_id", customerId);
 
       setProgress((progressData || []) as ProgressItem[]);
       setLoading(false);

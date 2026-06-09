@@ -2,20 +2,13 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowRight, BookOpenCheck, LogOut, Sunrise } from "lucide-react";
 import navMarkSrc from "@/assets/brand/nav-mark.png";
+import { getCustomerAuthState } from "@/lib/customer-auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/app")({
   beforeLoad: async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    if (!user) {
-      throw redirect({ to: "/customer-login", search: { redirect: "/app" } });
-    }
-
-    const { data: profile } = await supabase.from("profiles").select("role").single();
-    if (profile?.role !== "customer") {
+    const { isCustomer } = await getCustomerAuthState();
+    if (!isCustomer) {
       throw redirect({ to: "/customer-login", search: { redirect: "/app" } });
     }
   },

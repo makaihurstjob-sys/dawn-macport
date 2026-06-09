@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, LoaderCircle, QrCode } from "lucide-react";
+import { getCustomerAuthState } from "@/lib/customer-auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/go/$slug")({
@@ -30,11 +31,9 @@ function QrResolver() {
       }
 
       const coursePath = `/course/${resolved.course_slug}`;
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { isCustomer } = await getCustomerAuthState();
 
-      if (!user) {
+      if (!isCustomer) {
         await navigate({
           to: "/customer-login",
           search: { redirect: coursePath },
