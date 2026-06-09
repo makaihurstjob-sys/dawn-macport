@@ -121,6 +121,7 @@ function DashboardPage() {
   const [qrSlug, setQrSlug] = useState("dawn-method");
   const [qrStatus, setQrStatus] = useState("");
   const [customerStatus, setCustomerStatus] = useState("");
+  const [invitingCustomer, setInvitingCustomer] = useState(false);
   const [loading, setLoading] = useState(true);
   const [dashboardError, setDashboardError] = useState("");
 
@@ -392,8 +393,11 @@ function DashboardPage() {
   };
 
   const inviteCustomer = async () => {
+    if (invitingCustomer) return;
+
     setCustomerStatus("");
     setDashboardError("");
+    setInvitingCustomer(true);
 
     const {
       data: { session },
@@ -401,6 +405,7 @@ function DashboardPage() {
 
     if (!session?.access_token) {
       setCustomerStatus("Log in again before inviting a customer.");
+      setInvitingCustomer(false);
       return;
     }
 
@@ -419,6 +424,8 @@ function DashboardPage() {
       await refreshCustomerCourseData();
     } catch (error) {
       setCustomerStatus(error instanceof Error ? error.message : "Customer invite failed.");
+    } finally {
+      setInvitingCustomer(false);
     }
   };
 
@@ -558,6 +565,7 @@ function DashboardPage() {
               selectedCourseId={selectedCourseId}
               setSelectedCourseId={setSelectedCourseId}
               customerStatus={customerStatus}
+              invitingCustomer={invitingCustomer}
               inviteCustomer={inviteCustomer}
               qrSlug={qrSlug}
               setQrSlug={setQrSlug}
@@ -905,6 +913,7 @@ function CustomersCoursesView({
   selectedCourseId,
   setSelectedCourseId,
   customerStatus,
+  invitingCustomer,
   inviteCustomer,
   qrSlug,
   setQrSlug,
@@ -925,6 +934,7 @@ function CustomersCoursesView({
   selectedCourseId: string;
   setSelectedCourseId: (value: string) => void;
   customerStatus: string;
+  invitingCustomer: boolean;
   inviteCustomer: () => void;
   qrSlug: string;
   setQrSlug: (value: string) => void;
@@ -1002,10 +1012,12 @@ function CustomersCoursesView({
           <button
             type="button"
             onClick={inviteCustomer}
-            disabled={!customerName.trim() || !customerEmail.trim() || !selectedCourseId}
+            disabled={
+              invitingCustomer || !customerName.trim() || !customerEmail.trim() || !selectedCourseId
+            }
             className="mt-5 inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Send Invite
+            {invitingCustomer ? "Sending invite..." : "Send Invite"}
             <UserPlus className="h-4 w-4" />
           </button>
         </div>
