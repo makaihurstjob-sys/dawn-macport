@@ -50,6 +50,7 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
     { label: "Coaching", href: "#coaching" },
     ...(showTestimonials ? [{ label: "Testimonials", href: "#testimonials" }] : []),
     { label: "Contact", href: "#contact" },
+    { label: "Client Portal", href: "/customer-login" },
   ];
 
   return (
