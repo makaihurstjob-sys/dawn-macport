@@ -389,33 +389,6 @@ function Approach() {
       text: "We keep refining the path with accountability, clarity worksheets, and strategic execution support.",
     },
   ];
-  const fares = [
-    {
-      letter: "F",
-      title: "Faith",
-      text: "Start with spiritual grounding before rushing into decisions.",
-    },
-    {
-      letter: "A",
-      title: "Awareness",
-      text: "Name the patterns, fears, and desires shaping the current season.",
-    },
-    {
-      letter: "R",
-      title: "Renewal",
-      text: "Replace old narratives with truth, identity, and renewed perspective.",
-    },
-    {
-      letter: "E",
-      title: "Execution",
-      text: "Turn clarity into simple actions, rhythms, and follow-through.",
-    },
-    {
-      letter: "S",
-      title: "Stewardship",
-      text: "Keep tending the growth with accountability and reflection.",
-    },
-  ];
 
   return (
     <section id="coaching" className="relative overflow-hidden bg-[#fff7ed] py-24 sm:py-32">
@@ -456,36 +429,6 @@ function Approach() {
               </motion.article>
             );
           })}
-        </motion.div>
-
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="mt-14 rounded-2xl border border-primary/15 bg-background/80 p-6 shadow-[0_26px_80px_-60px_rgba(75,50,35,0.65)] sm:p-8"
-        >
-          <motion.div variants={reveal} className="mx-auto max-w-3xl text-center">
-            <p className="brand-kicker mb-3">F.A.R.E.S. Method</p>
-            <h3 className="font-serif text-3xl text-foreground sm:text-4xl">
-              The inner rhythm beneath the Dawn Method.
-            </h3>
-          </motion.div>
-          <div className="mt-8 grid gap-3 md:grid-cols-5">
-            {fares.map((item) => (
-              <motion.div
-                key={item.title}
-                variants={reveal}
-                className="rounded-xl border border-border/60 bg-white/62 p-4"
-              >
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                  {item.letter}
-                </div>
-                <h4 className="font-serif text-xl text-foreground">{item.title}</h4>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.text}</p>
-              </motion.div>
-            ))}
-          </div>
         </motion.div>
       </div>
     </section>
