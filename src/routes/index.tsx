@@ -389,6 +389,15 @@ function Approach() {
       text: "We keep refining the path with accountability, clarity worksheets, and strategic execution support.",
     },
   ];
+  const innerProcess = [
+    "Awareness",
+    "Release",
+    "Reframe",
+    "Alignment",
+    "Rebuild",
+    "Reinforce",
+    "Integration",
+  ];
 
   return (
     <section id="coaching" className="relative overflow-hidden bg-[#fff7ed] py-24 sm:py-32">
@@ -429,6 +438,37 @@ function Approach() {
               </motion.article>
             );
           })}
+        </motion.div>
+
+        <motion.div
+          variants={stagger}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="mt-14 rounded-2xl border border-primary/15 bg-background/80 p-6 shadow-[0_26px_80px_-60px_rgba(75,50,35,0.65)] sm:p-8"
+        >
+          <motion.div variants={reveal} className="mx-auto max-w-3xl text-center">
+            <p className="brand-kicker mb-3">The Inner Transformation Process</p>
+            <h3 className="font-serif text-3xl text-foreground sm:text-4xl">
+              The inner rhythm beneath the Dawn Method.
+            </h3>
+          </motion.div>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-8">
+            {innerProcess.map((item, index) => (
+              <motion.div
+                key={item}
+                variants={reveal}
+                className={`rounded-xl border border-border/60 bg-white/62 p-4 lg:col-span-2 ${
+                  index === 4 ? "lg:col-start-2" : ""
+                }`}
+              >
+                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                  {String(index + 1).padStart(2, "0")}
+                </div>
+                <h4 className="font-serif text-xl text-foreground">{item}</h4>
+              </motion.div>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>
