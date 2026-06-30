@@ -66,7 +66,7 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#fff8ea]/35 bg-[#fff8ea]/10 text-lg text-[#fff8ea] sm:h-10 sm:w-10"
             aria-hidden="true"
           >
-            ✦
+            A
           </span>
           <span className="brand-script hidden text-[1.5rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[1.5rem]">
             A&apos;New Dawn
@@ -113,7 +113,6 @@ function DawnScene() {
   const sunY = useTransform(smoothProgress, [0, 1], ["18vh", "-8vh"]);
   const skyOpacity = useTransform(smoothProgress, [0, 0.8], [1, 0.25]);
   const hillY = useTransform(smoothProgress, [0, 1], ["0vh", "10vh"]);
-  const textY = useTransform(smoothProgress, [0, 1], ["0vh", "18vh"]);
 
   return (
     <section
@@ -143,20 +142,9 @@ function DawnScene() {
         aria-hidden="true"
       />
 
-      <motion.div
-        style={{ y: textY }}
-        className="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl items-center px-4 pb-20 pt-12 sm:px-6"
-      >
-        <motion.div
-          variants={stagger}
-          initial="hidden"
-          animate="visible"
-          className="w-full max-w-4xl pt-8"
-        >
-          <motion.h1
-            variants={reveal}
-            className="w-full max-w-6xl font-serif text-5xl font-medium leading-[1.08] tracking-normal text-white sm:text-6xl sm:leading-[1.04] lg:text-7xl xl:text-8xl"
-          >
+      <div className="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl items-center px-4 pb-20 pt-12 sm:px-6">
+        <div className="w-full max-w-4xl pt-8">
+          <h1 className="w-full max-w-6xl font-serif text-5xl font-medium leading-[1.08] tracking-normal text-white sm:text-6xl sm:leading-[1.04] lg:text-7xl xl:text-8xl">
             <span className="block">Step out of the fog</span>
             <span className="block lg:whitespace-nowrap">
               and into{" "}
@@ -164,15 +152,12 @@ function DawnScene() {
                 A'New Dawn.
               </span>
             </span>
-          </motion.h1>
-          <motion.p
-            variants={reveal}
-            className="mt-8 max-w-2xl text-lg leading-8 text-white/78 sm:text-xl"
-          >
+          </h1>
+          <p className="mt-8 max-w-2xl text-lg leading-8 text-white/78 sm:text-xl">
             Faith-centered coaching for emerging leaders, young adults, and women ready to rebuild
             identity, rediscover purpose, and turn clarity into aligned action.
-          </motion.p>
-          <motion.div variants={reveal} className="mt-10 flex flex-col gap-3 sm:flex-row">
+          </p>
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <a
               href="/book"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-7 py-4 font-medium text-[#312234] shadow-[0_22px_80px_-26px_rgba(255,237,200,0.9)] transition hover:-translate-y-0.5 hover:bg-[#ffe5b8]"
@@ -186,9 +171,9 @@ function DawnScene() {
             >
               Meet the Approach
             </a>
-          </motion.div>
-        </motion.div>
-      </motion.div>
+          </div>
+        </div>
+      </div>
     </section>
   );
 }
@@ -593,6 +578,10 @@ function Testimonials() {
 
 function Contact() {
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const contactPhoneHref = `tel:${siteConfig.contactPhone.replace(/[^\d+]/g, "")}`;
+  const contactEmailHref = `mailto:${siteConfig.contactEmail}?subject=${encodeURIComponent(
+    "A'New Dawn Coaching Inquiry",
+  )}`;
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -640,14 +629,20 @@ function Contact() {
             If your spirit is saying it is time, I would love to hear from you.
           </motion.h2>
           <motion.div variants={reveal} className="mt-8 space-y-4 text-muted-foreground">
-            <p className="flex items-center gap-3">
+            <a
+              href={contactEmailHref}
+              className="flex w-fit items-center gap-3 transition hover:text-primary"
+            >
               <Mail className="h-5 w-5 text-primary" />
               {siteConfig.contactEmail}
-            </p>
-            <p className="flex items-center gap-3">
+            </a>
+            <a
+              href={contactPhoneHref}
+              className="flex w-fit items-center gap-3 transition hover:text-primary"
+            >
               <Phone className="h-5 w-5 text-primary" />
               {siteConfig.contactPhone}
-            </p>
+            </a>
             <a
               href={siteConfig.instagramUrl}
               target="_blank"
@@ -808,7 +803,7 @@ function FloatingCoachChat() {
       <button
         type="button"
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-[0_22px_70px_-22px_rgba(233,134,45,0.9)] transition hover:-translate-y-0.5 hover:bg-[#db6f23] hover:shadow-[0_26px_80px_-22px_rgba(233,134,45,0.95)]"
+        className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-primary text-white shadow-[0_22px_70px_-22px_rgba(233,134,45,0.9)] transition hover:-translate-y-0.5 hover:bg-[#fff8ea] hover:text-primary hover:shadow-[0_26px_80px_-24px_rgba(92,54,30,0.36)]"
         aria-label={open ? "Close A'New Dawn assistant" : "Open A'New Dawn assistant"}
       >
         <MessageCircleHeart className="h-6 w-6" />
