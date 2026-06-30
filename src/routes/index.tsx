@@ -17,7 +17,6 @@ import {
   X,
 } from "lucide-react";
 import wordmarkDarkSrc from "@/assets/brand/wordmark-dark.png";
-import navMarkSrc from "@/assets/brand/nav-mark.png";
 import coachPortraitSrc from "@/assets/brand/coach-portrait.jpeg";
 import { siteConfig } from "@/config/site";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,7 +26,9 @@ export const Route = createFileRoute("/")({
 });
 
 const reveal: Variants = {
-  hidden: { opacity: 0, y: 34, filter: "blur(10px)" },
+  // Keep server-rendered content readable if hydration or animation is delayed.
+  // Safari can otherwise leave the entire page at opacity: 0.
+  hidden: { y: 34 },
   visible: {
     opacity: 1,
     y: 0,
@@ -61,12 +62,9 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
           className="flex min-w-0 shrink-0 items-center gap-3 text-white"
           aria-label={siteConfig.shortName}
         >
-          <img
-            src={navMarkSrc}
-            alt=""
-            className="h-9 w-auto max-w-[84px] shrink-0 object-contain sm:h-10 sm:max-w-[104px] lg:h-11 lg:max-w-[118px]"
-            draggable={false}
-          />
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#fff8ea]/35 bg-[#fff8ea]/10 sm:h-10 sm:w-10">
+            <Sunrise className="h-5 w-5 text-[#fff8ea]" aria-hidden="true" />
+          </span>
           <span className="brand-script hidden text-[1.5rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[1.5rem]">
             A&apos;New Dawn
           </span>
