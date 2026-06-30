@@ -62,8 +62,11 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
           className="flex min-w-0 shrink-0 items-center gap-3 text-white"
           aria-label={siteConfig.shortName}
         >
-          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#fff8ea]/35 bg-[#fff8ea]/10 sm:h-10 sm:w-10">
-            <Sunrise className="h-5 w-5 text-[#fff8ea]" aria-hidden="true" />
+          <span
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#fff8ea]/35 bg-[#fff8ea]/10 text-lg text-[#fff8ea] sm:h-10 sm:w-10"
+            aria-hidden="true"
+          >
+            ✦
           </span>
           <span className="brand-script hidden text-[1.5rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[1.5rem]">
             A&apos;New Dawn
@@ -111,7 +114,6 @@ function DawnScene() {
   const skyOpacity = useTransform(smoothProgress, [0, 0.8], [1, 0.25]);
   const hillY = useTransform(smoothProgress, [0, 1], ["0vh", "10vh"]);
   const textY = useTransform(smoothProgress, [0, 1], ["0vh", "18vh"]);
-  const textOpacity = useTransform(smoothProgress, [0, 0.72], [1, 0]);
 
   return (
     <section
@@ -142,7 +144,7 @@ function DawnScene() {
       />
 
       <motion.div
-        style={{ y: textY, opacity: textOpacity }}
+        style={{ y: textY }}
         className="relative z-10 mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl items-center px-4 pb-20 pt-12 sm:px-6"
       >
         <motion.div
