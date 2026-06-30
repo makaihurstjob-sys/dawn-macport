@@ -1578,28 +1578,20 @@ function SettingsView({
             </div>
           </div>
 
-          <div className="grid gap-2 rounded-2xl bg-muted/55 p-2 sm:grid-cols-3">
-            {websiteThemeOptions.map((option) => {
-              const Icon = option.icon;
-              const active = websiteThemeMode === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => saveWebsiteThemeMode(option.value)}
-                  className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition ${
-                    active
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
-                  }`}
-                  aria-pressed={active}
-                >
-                  <Icon className="h-4 w-4" />
-                  {option.label}
-                </button>
-              );
-            })}
+          <div className="rounded-2xl bg-muted/55 p-2">
+            <button
+              type="button"
+              onClick={() => saveWebsiteThemeMode("light")}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-sm"
+              aria-pressed={websiteThemeMode === "light"}
+            >
+              <Sun className="h-4 w-4" />
+              Light only
+            </button>
           </div>
+          <p className="mt-3 text-sm text-muted-foreground">
+            Dark and system themes are disabled for the public website.
+          </p>
         </div>
 
         <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">

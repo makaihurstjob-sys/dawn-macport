@@ -14,6 +14,7 @@ import appCss from "../styles.css?url";
 import {
   getThemeSettingKeyForPath,
   normalizeWebsiteThemeMode,
+  WEBSITE_THEME_SETTING_KEY,
   watchWebsiteThemeMode,
 } from "@/lib/site-theme";
 import { supabase } from "@/integrations/supabase/client";
@@ -80,6 +81,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "color-scheme", content: "light" },
       { title: "A'New Dawn Coaching" },
       {
         name: "description",
@@ -165,6 +167,11 @@ function RootComponent() {
     let cleanupThemeWatcher = () => {};
     let mounted = true;
     const themeSettingKey = getThemeSettingKeyForPath(pathname);
+
+    if (themeSettingKey === WEBSITE_THEME_SETTING_KEY) {
+      cleanupThemeWatcher = watchWebsiteThemeMode("light");
+      return () => cleanupThemeWatcher();
+    }
 
     const loadThemeMode = async () => {
       const { data } = await supabase
