@@ -305,6 +305,11 @@ function CoursePage() {
   const [lessonActivity, setLessonActivity] = useState<Record<string, LessonActivity>>({});
   const [nearLessonEnd, setNearLessonEnd] = useState(false);
   const [completionPhase, setCompletionPhase] = useState<"idle" | "saving" | "ready-next">("idle");
+  const [expandedSectionIds, setExpandedSectionIds] = useState<string[]>([
+    "foundations",
+    "dawn-method",
+    "tools",
+  ]);
 
   useEffect(() => {
     const loadCourse = async () => {
@@ -553,6 +558,14 @@ function CoursePage() {
     window.location.href = "/";
   };
 
+  const toggleSectionExpanded = (sectionId: string) => {
+    setExpandedSectionIds((current) =>
+      current.includes(sectionId)
+        ? current.filter((id) => id !== sectionId)
+        : [...current, sectionId],
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#fffaf4] text-[#4a284f]">
@@ -624,12 +637,14 @@ function CoursePage() {
             {curriculum.map((section, sectionIndex) => {
               const sectionComplete = section.lessons.every((lesson) => completedKeys.has(lesson.id));
               const sectionActive = section.id === activeLesson.sectionId;
+              const sectionExpanded = expandedSectionIds.includes(section.id);
 
               return (
                 <div key={section.id} className="mb-5">
                   <button
                     type="button"
-                    onClick={() => setActiveLessonId(section.lessons[0].id)}
+                    onClick={() => toggleSectionExpanded(section.id)}
+                    aria-expanded={sectionExpanded}
                     className="flex w-full items-center justify-between gap-3 py-1.5 text-left text-sm font-semibold text-[#321d38]"
                   >
                     <span className="flex items-center gap-3">
@@ -642,54 +657,56 @@ function CoursePage() {
                         {sectionIndex + 1}. {section.title}
                       </span>
                     </span>
-                    {sectionActive ? (
+                    {sectionExpanded ? (
                       <ChevronDown className="h-4 w-4" />
                     ) : (
                       <ChevronDown className="h-4 w-4 -rotate-90" />
                     )}
                   </button>
 
-                  <div className="mt-2 space-y-1.5">
-                    {section.lessons.map((lesson) => {
-                      const lessonActive = lesson.id === activeLesson.id;
-                      const complete = completedKeys.has(lesson.id);
+                  {sectionExpanded && (
+                    <div className="mt-2 space-y-1.5">
+                      {section.lessons.map((lesson) => {
+                        const lessonActive = lesson.id === activeLesson.id;
+                        const complete = completedKeys.has(lesson.id);
 
-                      return (
-                        <button
-                          key={lesson.id}
-                          type="button"
-                          onClick={() => setActiveLessonId(lesson.id)}
-                          className={`flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left text-xs transition ${
-                            lessonActive
-                              ? "border-[#f0c9a8] bg-[#fff1e3] text-[#321d38]"
-                              : "border-transparent text-[#5e4c60] hover:bg-[#fff5eb]"
-                          }`}
-                        >
-                          <span
-                            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[0.35rem] border ${
+                        return (
+                          <button
+                            key={lesson.id}
+                            type="button"
+                            onClick={() => setActiveLessonId(lesson.id)}
+                            className={`flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left text-xs transition ${
                               lessonActive
-                                ? "border-[#f08045] text-[#f08045]"
-                                : "border-[#4a2854] text-[#4a2854]"
+                                ? "border-[#f0c9a8] bg-[#fff1e3] text-[#321d38]"
+                                : "border-transparent text-[#5e4c60] hover:bg-[#fff5eb]"
                             }`}
                           >
-                            <Video className="h-2.5 w-2.5" />
-                          </span>
-                          <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
-                          <span
-                            className={`h-3.5 w-3.5 shrink-0 rounded-full border ${
-                              complete
-                                ? "border-[#d88a20] bg-[#d88a20]"
-                                : lessonActive
-                                  ? "border-[#f08045] bg-[#f08045]"
-                                  : "border-[#c9b9ad]"
-                            }`}
-                          >
-                            {complete && <Check className="h-3 w-3 text-white" />}
-                          </span>
-                        </button>
-                      );
-                    })}
-                  </div>
+                            <span
+                              className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[0.35rem] border ${
+                                lessonActive
+                                  ? "border-[#f08045] text-[#f08045]"
+                                  : "border-[#4a2854] text-[#4a2854]"
+                              }`}
+                            >
+                              <Video className="h-2.5 w-2.5" />
+                            </span>
+                            <span className="min-w-0 flex-1 truncate">{lesson.title}</span>
+                            <span
+                              className={`h-3.5 w-3.5 shrink-0 rounded-full border ${
+                                complete
+                                  ? "border-[#d88a20] bg-[#d88a20]"
+                                  : lessonActive
+                                    ? "border-[#f08045] bg-[#f08045]"
+                                    : "border-[#c9b9ad]"
+                              }`}
+                            >
+                              {complete && <Check className="h-3 w-3 text-white" />}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
 
                   {sectionComplete && <span className="sr-only">{section.title} complete</span>}
                 </div>
