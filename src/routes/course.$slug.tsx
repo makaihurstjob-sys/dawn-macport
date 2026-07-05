@@ -505,9 +505,21 @@ function CoursePage() {
           </div>
 
           <div className="px-6">
-            <h2 className="border-b border-[#ead9c7] pb-3 text-sm font-semibold text-[#321d38]">
+            <h2 className="text-sm font-semibold text-[#321d38]">
               Course Progress
             </h2>
+            <div className="mt-4 border-b border-[#ead9c7] pb-5">
+              <div className="flex items-center justify-between text-xs text-[#6f6470]">
+                <span>{completedCount} of {allLessons.length} lessons</span>
+                <span>{progressPercent}% Complete</span>
+              </div>
+              <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#f1e7dc]">
+                <div
+                  className="h-full rounded-full bg-[linear-gradient(90deg,#ef824a,#ffd889)] transition-all"
+                  style={{ width: `${progressPercent}%` }}
+                />
+              </div>
+            </div>
           </div>
 
           <nav className="flex-1 overflow-y-auto px-5 py-4" aria-label="Course progress">
@@ -764,20 +776,7 @@ function CoursePage() {
           </main>
 
           <aside className="hidden border-l border-[#ead9c7] bg-[#fffaf4]/82 lg:block">
-            <div className="sticky top-[68px] min-h-[calc(100vh-68px)]">
-              <section className="border-b border-[#ead9c7] p-7">
-                <div className="flex items-center justify-between">
-                  <h2 className="font-serif text-xl text-[#4a284f]">Your Progress</h2>
-                  <span className="text-sm text-[#5f5360]">{progressPercent}% Complete</span>
-                </div>
-                <div className="mt-5 h-2.5 overflow-hidden rounded-full bg-[#f1e7dc]">
-                  <div
-                    className="h-full rounded-full bg-[linear-gradient(90deg,#ef824a,#ffd889)] transition-all"
-                    style={{ width: `${progressPercent}%` }}
-                  />
-                </div>
-              </section>
-
+            <div className="sticky top-[68px] flex min-h-[calc(100vh-68px)] flex-col justify-end">
               <div className="space-y-5 p-7">
                 <section className="rounded-xl border border-[#ead0ba] bg-[#fff8ef] p-5">
                   <div className="flex gap-4">
