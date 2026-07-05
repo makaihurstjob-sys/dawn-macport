@@ -305,6 +305,7 @@ function CoursePage() {
   const [lessonActivity, setLessonActivity] = useState<Record<string, LessonActivity>>({});
   const [nearLessonEnd, setNearLessonEnd] = useState(false);
   const [completionPhase, setCompletionPhase] = useState<"idle" | "saving" | "ready-next">("idle");
+  const [curriculumCollapsed, setCurriculumCollapsed] = useState(false);
   const [expandedSectionIds, setExpandedSectionIds] = useState<string[]>([
     "foundations",
     "dawn-method",
@@ -587,15 +588,23 @@ function CoursePage() {
 
   return (
     <div className="min-h-screen bg-[#fffaf4] text-[#321d38]">
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[300px] border-r border-[#ead9c7] bg-[#fffaf4]/96 shadow-[18px_0_60px_-48px_rgba(54,30,45,0.7)] backdrop-blur-xl xl:block">
-        <div className="flex h-full flex-col">
+      <aside
+        className={`fixed inset-y-0 left-0 z-40 hidden border-r border-[#ead9c7] bg-[#fffaf4]/96 shadow-[18px_0_60px_-48px_rgba(54,30,45,0.7)] backdrop-blur-xl transition-[width] duration-300 ease-out xl:block ${
+          curriculumCollapsed ? "w-0" : "w-[300px]"
+        }`}
+      >
+        <div className={`flex h-full w-[300px] flex-col transition-opacity duration-200 ${curriculumCollapsed ? "pointer-events-none opacity-0" : "opacity-100"}`}>
           <div className="relative px-7 pb-7 pt-8">
             <button
               type="button"
-              aria-label="Collapse curriculum"
-              className="absolute -right-4 top-7 flex h-9 w-9 items-center justify-center rounded-full border border-[#ead9c7] bg-[#fffaf4] text-[#4a284f] shadow-sm"
+              aria-label={curriculumCollapsed ? "Expand course progress" : "Collapse course progress"}
+              aria-expanded={!curriculumCollapsed}
+              onClick={() => setCurriculumCollapsed((current) => !current)}
+              className={`pointer-events-auto fixed top-7 z-50 flex h-9 w-9 items-center justify-center rounded-full border border-[#ead9c7] bg-[#fffaf4] text-[#4a284f] shadow-sm transition-[left] duration-300 ease-out hover:bg-[#fff1e3] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#f08045] ${
+                curriculumCollapsed ? "left-4" : "left-[282px]"
+              }`}
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className={`h-4 w-4 transition-transform duration-300 ${curriculumCollapsed ? "rotate-180" : ""}`} />
             </button>
             <a href="/" className="flex items-center gap-3">
               <img
@@ -726,7 +735,7 @@ function CoursePage() {
         </div>
       </aside>
 
-      <header className="sticky top-0 z-30 border-b border-[#ead9c7] bg-[#fffaf4]/92 backdrop-blur-xl xl:ml-[300px]">
+      <header className={`sticky top-0 z-30 border-b border-[#ead9c7] bg-[#fffaf4]/92 backdrop-blur-xl transition-[margin] duration-300 ease-out ${curriculumCollapsed ? "xl:ml-0" : "xl:ml-[300px]"}`}>
         <div className="grid min-h-[68px] grid-cols-[1fr_auto] items-center gap-4 px-5 sm:px-8">
           <div className="flex min-w-0 items-center gap-2 text-sm font-semibold text-[#3f2d43]">
             <span>{activeSectionIndex + 1}.</span>
@@ -753,7 +762,7 @@ function CoursePage() {
         </div>
       </header>
 
-      <div className="xl:ml-[300px]">
+      <div className={`transition-[margin] duration-300 ease-out ${curriculumCollapsed ? "xl:ml-0" : "xl:ml-[300px]"}`}>
         <main className="min-w-0 px-5 py-8 sm:px-8 lg:px-10 xl:px-12">
           <div className="mx-auto max-w-7xl">
             <section className="relative overflow-hidden pb-2">
