@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import wordmarkDarkSrc from "@/assets/brand/wordmark-dark.png";
+import navMarkSrc from "@/assets/brand/nav-mark.png";
 import coachPortraitSrc from "@/assets/brand/coach-portrait.jpeg";
 import { siteConfig } from "@/config/site";
 import { supabase } from "@/integrations/supabase/client";
@@ -62,12 +63,12 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
           className="flex min-w-0 shrink-0 items-center gap-3 text-white"
           aria-label={siteConfig.shortName}
         >
-          <span
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#fff8ea]/35 bg-[#fff8ea]/10 text-lg text-[#fff8ea] sm:h-10 sm:w-10"
-            aria-hidden="true"
-          >
-            A
-          </span>
+          <img
+            src={navMarkSrc}
+            alt=""
+            className="h-10 w-auto max-w-[72px] shrink-0 object-contain drop-shadow-[0_0_18px_rgba(255,218,154,0.28)] sm:h-11 sm:max-w-[86px]"
+            draggable={false}
+          />
           <span className="brand-script hidden text-[1.5rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[1.5rem]">
             A&apos;New Dawn
           </span>

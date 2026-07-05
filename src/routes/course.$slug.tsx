@@ -6,7 +6,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  Circle,
   Clock3,
   Download,
   FileText,
@@ -18,6 +17,7 @@ import {
   Sunrise,
   Video,
 } from "lucide-react";
+import navMarkSrc from "@/assets/brand/nav-mark.png";
 import { getCustomerAuthState } from "@/lib/customer-auth";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -487,9 +487,12 @@ function CoursePage() {
               <ChevronLeft className="h-4 w-4" />
             </button>
             <a href="/" className="flex items-center gap-3">
-              <span className="flex h-12 w-14 items-center justify-center text-[#e58a45]">
-                <Sunrise className="h-12 w-12 stroke-[1.25]" />
-              </span>
+              <img
+                src={navMarkSrc}
+                alt=""
+                className="h-12 w-auto max-w-[58px] shrink-0 object-contain"
+                draggable={false}
+              />
               <span>
                 <span className="brand-script block text-[2rem] leading-none text-[#6a4a68]">
                   A&apos;New Dawn
@@ -503,11 +506,11 @@ function CoursePage() {
 
           <div className="px-6">
             <h2 className="border-b border-[#ead9c7] pb-3 text-sm font-semibold text-[#321d38]">
-              Course Curriculum
+              Course Progress
             </h2>
           </div>
 
-          <nav className="flex-1 overflow-y-auto px-5 py-4" aria-label="Course curriculum">
+          <nav className="flex-1 overflow-y-auto px-5 py-4" aria-label="Course progress">
             {curriculum.map((section, sectionIndex) => {
               const sectionComplete = section.lessons.every((lesson) => completedKeys.has(lesson.id));
               const sectionActive = section.id === activeLesson.sectionId;
@@ -775,55 +778,6 @@ function CoursePage() {
                 </div>
               </section>
 
-              <section className="border-b border-[#ead9c7] p-7">
-                <h2 className="font-serif text-xl text-[#4a284f]">Course Progress</h2>
-                <div className="mt-5 space-y-5">
-                  {curriculum.map((section, sectionIndex) => {
-                    const sectionActive = section.id === activeLesson.sectionId;
-                    const sectionDone = section.lessons.every((lesson) => completedKeys.has(lesson.id));
-
-                    return (
-                      <div key={section.id} className="relative">
-                        <button
-                          type="button"
-                          onClick={() => setActiveLessonId(section.lessons[0].id)}
-                          className="flex w-full items-center gap-3 text-left text-sm text-[#4b3b4d]"
-                        >
-                          <span
-                            className={`h-2 w-2 rounded-full ${
-                              sectionActive ? "bg-[#ee8646]" : "bg-[#4a2854]"
-                            }`}
-                          />
-                          <span className="flex-1">
-                            {sectionIndex + 1}. {section.title}
-                          </span>
-                          <StatusDot active={sectionActive} complete={sectionDone} />
-                        </button>
-                        {sectionActive && (
-                          <div className="ml-5 mt-3 space-y-3">
-                            {section.lessons.map((lesson) => (
-                              <button
-                                key={lesson.id}
-                                type="button"
-                                onClick={() => setActiveLessonId(lesson.id)}
-                                className="flex w-full items-center gap-3 text-left text-xs text-[#5f5360]"
-                              >
-                                <StatusDot
-                                  active={lesson.id === activeLesson.id}
-                                  complete={completedKeys.has(lesson.id)}
-                                  small
-                                />
-                                <span>{lesson.title}</span>
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </section>
-
               <div className="space-y-5 p-7">
                 <section className="rounded-xl border border-[#ead0ba] bg-[#fff8ef] p-5">
                   <div className="flex gap-4">
@@ -870,32 +824,5 @@ function CoursePage() {
         </div>
       </div>
     </div>
-  );
-}
-
-function StatusDot({
-  active,
-  complete,
-  small = false,
-}: {
-  active: boolean;
-  complete: boolean;
-  small?: boolean;
-}) {
-  return (
-    <span
-      className={`flex shrink-0 items-center justify-center rounded-full border ${
-        small ? "h-3.5 w-3.5" : "h-5 w-5"
-      } ${
-        complete
-          ? "border-[#d88a20] bg-[#d88a20] text-white"
-          : active
-            ? "border-[#ef824a] bg-[#fffaf4] text-[#ef824a] ring-2 ring-[#ef824a]/25"
-            : "border-[#ccbcae] bg-[#fffaf4]"
-      }`}
-    >
-      {complete ? <Check className={small ? "h-2.5 w-2.5" : "h-3.5 w-3.5"} /> : null}
-      {!complete && active ? <Circle className={small ? "h-2 w-2 fill-current" : "h-3 w-3 fill-current"} /> : null}
-    </span>
   );
 }
