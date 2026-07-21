@@ -1658,31 +1658,26 @@ function SettingsView({
 
 function DeveloperView({ rawData }: { rawData: unknown }) {
   return (
-    <section className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+    <section>
       <div className="rounded-2xl border border-border/70 bg-[#161821] p-6 text-slate-100 shadow-sm">
-        <div className="mb-5 flex items-center gap-3">
-          <FileJson className="h-5 w-5 text-sky-300" />
-          <h3 className="font-mono text-lg">Raw JSON View</h3>
+        <div className="mb-5 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3">
+            <FileJson className="h-5 w-5 text-sky-300" />
+            <h3 className="font-mono text-lg">Raw JSON View</h3>
+          </div>
+          <button
+            type="button"
+            disabled
+            title="CSV export will be available here soon"
+            className="inline-flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 disabled:cursor-not-allowed disabled:opacity-75"
+          >
+            <Download className="h-3.5 w-3.5" />
+            CSV Export
+          </button>
         </div>
         <pre className="max-h-[620px] overflow-auto rounded-xl bg-black/35 p-4 text-xs leading-6 text-slate-300">
           {JSON.stringify(rawData, null, 2)}
         </pre>
-      </div>
-      <div className="space-y-5">
-        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
-          <Download className="mb-4 h-6 w-6 text-primary" />
-          <h3 className="font-serif text-2xl text-foreground">CSV Export</h3>
-          <p className="mt-3 leading-7 text-muted-foreground">
-            Placeholder for future export tooling. No CSV file is generated yet.
-          </p>
-          <button
-            type="button"
-            disabled
-            className="mt-5 rounded-xl bg-muted px-5 py-3 text-sm font-medium text-muted-foreground"
-          >
-            Export Placeholder
-          </button>
-        </div>
       </div>
     </section>
   );
