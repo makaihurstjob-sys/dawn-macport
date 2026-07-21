@@ -599,12 +599,7 @@ function IntakeFormPage() {
           <div className="mb-5">
             <div className="mb-3 flex items-center justify-between text-sm font-medium">
               <span className="flex items-center gap-2 text-[#4f332b]">
-                <img
-                  src={navMarkSrc}
-                  alt=""
-                  className="h-7 w-auto max-w-[48px] object-contain"
-                  draggable={false}
-                />
+                <img src={navMarkSrc} alt="" className="h-7 w-auto max-w-[48px] object-contain" draggable={false} />
                 <span className="brand-script text-[1.45rem] leading-none">A&apos;New Dawn</span>
                 <span className="font-sans text-sm font-semibold">Form</span>
               </span>

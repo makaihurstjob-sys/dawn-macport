@@ -100,36 +100,34 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       {
         rel: "icon",
-        type: "image/png",
-        href: "/sitehouse-logo.png?v=5",
+        href: "/favicon.ico?v=4",
         sizes: "any",
       },
       {
         rel: "shortcut icon",
-        type: "image/png",
-        href: "/sitehouse-logo.png?v=5",
+        href: "/favicon.ico?v=4",
       },
       {
         rel: "icon",
         type: "image/png",
-        href: "/sitehouse-logo.png?v=5",
+        href: "/favicon.png?v=4",
       },
       {
         rel: "icon",
         type: "image/png",
         sizes: "32x32",
-        href: "/sitehouse-logo.png?v=5",
+        href: "/favicon-32.png?v=4",
       },
       {
         rel: "icon",
         type: "image/png",
         sizes: "16x16",
-        href: "/sitehouse-logo.png?v=5",
+        href: "/favicon-16.png?v=4",
       },
       {
         rel: "apple-touch-icon",
         sizes: "180x180",
-        href: "/sitehouse-logo.png?v=5",
+        href: "/apple-touch-icon.png?v=4",
       },
       {
         rel: "manifest",
@@ -169,15 +167,6 @@ function RootComponent() {
     let cleanupThemeWatcher = () => {};
     let mounted = true;
     const themeSettingKey = getThemeSettingKeyForPath(pathname);
-
-    if (
-      pathname.startsWith("/hosting") ||
-      pathname.startsWith("/ops-gate") ||
-      pathname.startsWith("/ops-gmail") ||
-      pathname.startsWith("/ops-hub")
-    ) {
-      return cleanupThemeWatcher;
-    }
 
     if (themeSettingKey === WEBSITE_THEME_SETTING_KEY) {
       cleanupThemeWatcher = watchWebsiteThemeMode("light");

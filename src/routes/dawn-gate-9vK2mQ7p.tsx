@@ -50,16 +50,6 @@ function AdminLogin() {
       return;
     }
 
-    const redirectTo =
-      typeof window !== "undefined"
-        ? new URLSearchParams(window.location.search).get("redirect")
-        : null;
-
-    if (redirectTo) {
-      window.location.assign(redirectTo);
-      return;
-    }
-
     await navigate({ to: "/dashboard" });
   };
 
@@ -70,14 +60,10 @@ function AdminLogin() {
         aria-hidden="true"
       />
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-7 sm:px-6">
-        <a
-          href="/"
-          className="inline-flex w-fit items-center gap-2 rounded-full border border-white/75 bg-white/45 px-4 py-2 text-sm font-medium text-[#51372f] shadow-sm backdrop-blur transition hover:bg-white/70"
-        >
+        <a href="/" className="inline-flex w-fit items-center gap-2 rounded-full border border-white/75 bg-white/45 px-4 py-2 text-sm font-medium text-[#51372f] shadow-sm backdrop-blur transition hover:bg-white/70">
           <ArrowLeft className="h-4 w-4" />
           Home
         </a>
-
         <section className="flex flex-1 items-center justify-center py-10 sm:py-14">
           <div className="relative w-full max-w-[560px] before:absolute before:inset-x-4 before:top-4 before:-bottom-4 before:bg-[#e89e5e]/20 before:content-[''] sm:before:inset-x-5 sm:before:top-5 sm:before:-bottom-5">
             <form onSubmit={handleLogin} className="relative rounded-[1.65rem] border border-white/75 bg-[#fffaf1]/92 px-6 py-8 shadow-[0_34px_100px_-65px_rgba(94,55,33,0.9)] backdrop-blur-xl sm:px-8 sm:py-10">
@@ -86,7 +72,6 @@ function AdminLogin() {
                 <span className="brand-script text-[1.45rem] leading-none text-[#4f332b]">A&apos;New Dawn</span>
               </div>
               <h1 className="mb-6 text-center font-serif text-4xl leading-tight text-[#4f332b]">Admin Login</h1>
-
               {error && <div className="mb-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
               <label className="block text-sm font-semibold text-foreground">
                 Email
