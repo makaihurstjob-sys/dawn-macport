@@ -1683,20 +1683,6 @@ function DeveloperView({ rawData }: { rawData: unknown }) {
             Export Placeholder
           </button>
         </div>
-        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
-          <Settings className="mb-4 h-6 w-6 text-primary" />
-          <h3 className="font-serif text-2xl text-foreground">System Settings</h3>
-          <p className="mt-3 leading-7 text-muted-foreground">
-            Placeholder for environment checks, integrations, and deployment notes.
-          </p>
-        </div>
-        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
-          <FileText className="mb-4 h-6 w-6 text-primary" />
-          <h3 className="font-serif text-2xl text-foreground">Developer Notes</h3>
-          <p className="mt-3 leading-7 text-muted-foreground">
-            Developer-only area for implementation notes and operational context.
-          </p>
-        </div>
       </div>
     </section>
   );
