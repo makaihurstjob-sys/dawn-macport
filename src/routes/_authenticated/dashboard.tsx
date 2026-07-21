@@ -1197,7 +1197,7 @@ function CustomersCoursesView({
 
   return (
     <section className="space-y-5">
-      <div className="grid items-stretch gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+      <div className="grid items-stretch gap-5 xl:grid-cols-2">
         <div className="flex min-h-[30.25rem] flex-col rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
           <div className="mb-6 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -1280,7 +1280,7 @@ function CustomersCoursesView({
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4">
             <label className="block text-sm font-semibold text-foreground">
               Short link name
               <input
