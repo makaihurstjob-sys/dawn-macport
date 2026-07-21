@@ -42,6 +42,7 @@ const questions: Array<{
 function BookingPage() {
   const [step, setStep] = useState(0);
   const [clientName, setClientName] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
   const [bookingUrl, setBookingUrl] = useState(siteConfig.bookingUrl);
   const [answers, setAnswers] = useState<Record<AnswerKey, string>>({
     seeking: "",
@@ -103,11 +104,14 @@ function BookingPage() {
     event.preventDefault();
 
     const trimmedName = clientName.trim();
-    if (!trimmedName) return;
+    const trimmedPhone = clientPhone.trim();
+    if (!trimmedName || !trimmedPhone) return;
 
     setIsSubmitting(true);
     const { error } = await Promise.race([
-      supabase.from("booking_qualifications").insert([{ ...answers, client_name: trimmedName }]),
+      supabase
+        .from("booking_qualifications")
+        .insert([{ ...answers, client_name: trimmedName, phone: trimmedPhone }]),
       new Promise<{ error: Error }>((resolve) => {
         window.setTimeout(() => resolve({ error: new Error("Booking save timed out") }), 3500);
       }),
@@ -122,17 +126,13 @@ function BookingPage() {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[#fffaf1] text-foreground">
+    <div className="relative min-h-screen overflow-hidden bg-[#fffaf1] text-foreground">
       <div
-        className="absolute inset-x-0 top-0 h-[58vh] bg-[linear-gradient(180deg,#241f2f_0%,#674454_48%,#f4bd78_100%)]"
+        className="fixed inset-0 bg-[linear-gradient(180deg,#241f2f_0%,#513447_30%,#b1765f_58%,#f4bd78_76%,#fffaf1_100%)]"
         aria-hidden="true"
       />
       <div
-        className="absolute left-[18%] top-[24vh] h-56 w-56 rounded-full bg-[#ffd57e]/80 blur-sm shadow-[0_0_110px_36px_rgba(255,198,105,0.42)]"
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-x-0 top-[42vh] h-64 bg-[linear-gradient(180deg,rgba(255,250,241,0)_0%,#fffaf1_72%)]"
+        className="fixed left-[16%] top-[26vh] h-56 w-56 rounded-full bg-[#ffd57e]/55 blur-sm shadow-[0_0_120px_40px_rgba(255,198,105,0.34)]"
         aria-hidden="true"
       />
 
@@ -163,7 +163,7 @@ function BookingPage() {
                 <div className="mb-8">
                   <div className="mb-3 flex items-center justify-between text-sm font-medium text-muted-foreground">
                     <span>
-                      {nameStep ? "Your name" : `Question ${step + 1} of ${questions.length}`}
+                      {nameStep ? "Your details" : `Question ${step + 1} of ${questions.length}`}
                     </span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-muted">
@@ -227,10 +227,10 @@ function BookingPage() {
                     transition={{ duration: 0.32, ease: "easeOut" }}
                   >
                     <h2 className="font-serif text-3xl leading-tight text-foreground">
-                      What name should we attach to this request?
+                      What name and phone number should we attach to this request?
                     </h2>
                     <p className="mt-3 leading-7 text-muted-foreground">
-                      This helps the coach recognize your booking quiz inside the dashboard.
+                      This helps the coach recognize your booking quiz and follow up if needed.
                     </p>
                     <label className="mt-8 block text-sm font-semibold text-foreground">
                       Name
@@ -241,6 +241,18 @@ function BookingPage() {
                         onChange={(event) => setClientName(event.target.value)}
                         className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                         placeholder="Your name"
+                      />
+                    </label>
+                    <label className="mt-5 block text-sm font-semibold text-foreground">
+                      Phone number
+                      <input
+                        type="tel"
+                        required
+                        value={clientPhone}
+                        onChange={(event) => setClientPhone(event.target.value)}
+                        inputMode="tel"
+                        className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
+                        placeholder="(555) 123-4567"
                       />
                     </label>
                     {submitError && (

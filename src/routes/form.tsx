@@ -9,8 +9,8 @@ import {
   Mic,
   MicOff,
   Sparkles,
-  Sunrise,
 } from "lucide-react";
+import navMarkSrc from "@/assets/brand/nav-mark.png";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/form")({
@@ -591,24 +591,30 @@ function IntakeFormPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#241f2f] px-4 py-5 text-foreground sm:px-6">
-      <div className="fixed inset-0 bg-[linear-gradient(180deg,#17131f_0%,#2b2434_36%,#7a5360_76%,#2b2434_100%)]" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,213,137,0.18),transparent_38%)]" />
+    <div className="min-h-screen bg-[#fffaf2] px-4 py-5 text-foreground sm:px-6">
+      <div className="fixed inset-0 bg-[linear-gradient(180deg,#fffaf2_0%,#fae4b7_40%,#f1ad78_72%,#fff0dc_100%)]" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_50%_12%,rgba(255,255,255,0.7),transparent_38%)]" />
       <main className="relative mx-auto flex min-h-[calc(100vh-2.5rem)] max-w-3xl flex-col justify-start py-2 lg:justify-center">
         {!complete && (
           <div className="mb-5">
             <div className="mb-3 flex items-center justify-between text-sm font-medium">
-              <span className="flex items-center gap-2 text-white">
-                <Sunrise className="h-4 w-4" />
-                A'New Dawn Intake
+              <span className="flex items-center gap-2 text-[#4f332b]">
+                <img
+                  src={navMarkSrc}
+                  alt=""
+                  className="h-7 w-auto max-w-[48px] object-contain"
+                  draggable={false}
+                />
+                <span className="brand-script text-[1.45rem] leading-none">A&apos;New Dawn</span>
+                <span className="font-sans text-sm font-semibold">Form</span>
               </span>
-              <span className="text-white/75">
+              <span className="text-[#765e56]">
                 Step {currentStep + 1} of {formSteps.length}
               </span>
             </div>
-            <div className="h-2 overflow-hidden rounded-full bg-white/22">
+            <div className="h-2 overflow-hidden rounded-full bg-[#e7d9c5]">
               <motion.div
-                className="h-full rounded-full bg-[#ffd589]"
+                className="h-full rounded-full bg-[#e89e5e]"
                 animate={{ width: `${progress}%` }}
                 transition={{ duration: 0.4 }}
               />
@@ -616,7 +622,7 @@ function IntakeFormPage() {
           </div>
         )}
 
-        <div className="rounded-2xl border border-white/45 bg-background/90 p-4 shadow-[0_40px_120px_-70px_rgba(0,0,0,1)] backdrop-blur-xl sm:p-6 md:p-7">
+        <div className="rounded-2xl border border-white/75 bg-[#fffaf1]/92 p-4 shadow-[0_40px_120px_-70px_rgba(94,55,33,0.55)] backdrop-blur-xl sm:p-6 md:p-7">
           {!complete ? (
               <section>
                 <p className="mb-3 text-xs font-bold uppercase tracking-[0.26em] text-primary">

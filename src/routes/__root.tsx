@@ -100,34 +100,36 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     links: [
       {
         rel: "icon",
-        href: "/favicon.ico?v=4",
+        type: "image/png",
+        href: "/sitehouse-logo.png?v=5",
         sizes: "any",
       },
       {
         rel: "shortcut icon",
-        href: "/favicon.ico?v=4",
+        type: "image/png",
+        href: "/sitehouse-logo.png?v=5",
       },
       {
         rel: "icon",
         type: "image/png",
-        href: "/favicon.png?v=4",
+        href: "/sitehouse-logo.png?v=5",
       },
       {
         rel: "icon",
         type: "image/png",
         sizes: "32x32",
-        href: "/favicon-32.png?v=4",
+        href: "/sitehouse-logo.png?v=5",
       },
       {
         rel: "icon",
         type: "image/png",
         sizes: "16x16",
-        href: "/favicon-16.png?v=4",
+        href: "/sitehouse-logo.png?v=5",
       },
       {
         rel: "apple-touch-icon",
         sizes: "180x180",
-        href: "/apple-touch-icon.png?v=4",
+        href: "/sitehouse-logo.png?v=5",
       },
       {
         rel: "manifest",
@@ -168,6 +170,15 @@ function RootComponent() {
     let mounted = true;
     const themeSettingKey = getThemeSettingKeyForPath(pathname);
 
+    if (
+      pathname.startsWith("/hosting") ||
+      pathname.startsWith("/ops-gate") ||
+      pathname.startsWith("/ops-gmail") ||
+      pathname.startsWith("/ops-hub")
+    ) {
+      return cleanupThemeWatcher;
+    }
+
     if (themeSettingKey === WEBSITE_THEME_SETTING_KEY) {
       cleanupThemeWatcher = watchWebsiteThemeMode("light");
       return () => cleanupThemeWatcher();
@@ -193,9 +204,35 @@ function RootComponent() {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    const pointerQuery = window.matchMedia("(hover: hover) and (pointer: fine)");
+    if (!pointerQuery.matches) return;
+
+    let frame = 0;
+    let x = "50%";
+    let y = "50%";
+    const paintCursorShade = () => {
+      document.documentElement.style.setProperty("--dawn-cursor-x", x);
+      document.documentElement.style.setProperty("--dawn-cursor-y", y);
+      frame = 0;
+    };
+    const followPointer = (event: PointerEvent) => {
+      x = `${event.clientX}px`;
+      y = `${event.clientY}px`;
+      if (!frame) frame = window.requestAnimationFrame(paintCursorShade);
+    };
+
+    window.addEventListener("pointermove", followPointer, { passive: true });
+    return () => {
+      window.removeEventListener("pointermove", followPointer);
+      if (frame) window.cancelAnimationFrame(frame);
+    };
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
+      <div className="cursor-dawn-shade" aria-hidden="true" />
     </QueryClientProvider>
   );
 }

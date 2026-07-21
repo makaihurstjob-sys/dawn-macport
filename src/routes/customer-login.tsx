@@ -148,36 +148,6 @@ function CustomerLogin() {
     await navigate({ to: redirectPath });
   };
 
-  const sendLoginLink = async () => {
-    setError("");
-    setLinkStatus("");
-    const trimmedEmail = email.trim();
-    if (!trimmedEmail) {
-      setError("Enter your email first, then request a login link.");
-      return;
-    }
-
-    const { error: otpError } = await supabase.auth.signInWithOtp({
-      email: trimmedEmail,
-      options: {
-        shouldCreateUser: false,
-        emailRedirectTo:
-          typeof window === "undefined"
-            ? undefined
-            : `${window.location.origin}/customer-login?redirect=${encodeURIComponent(
-                redirectPath,
-              )}`,
-      },
-    });
-
-    if (otpError) {
-      setError(otpError.message);
-      return;
-    }
-
-    setLinkStatus("Check your email for the secure login link.");
-  };
-
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fffaf2_0%,#fae4b7_40%,#f1ad78_72%,#fff0dc_100%)] text-foreground">
       <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-7 sm:px-6">
@@ -286,18 +256,9 @@ function CustomerLogin() {
                     : "Opening portal..."
                   : isSettingPassword
                     ? "Create Password"
-                    : "Open Portal"}
+                    : "Login"}
                 <UserRoundCheck className="h-4 w-4" />
               </button>
-              {!isSettingPassword && (
-                <button
-                  type="button"
-                  onClick={sendLoginLink}
-                  className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-[#e7d9c5] bg-[#fffdf7] px-5 py-3 font-medium text-foreground transition hover:bg-muted"
-                >
-                  Email me a secure login link
-                </button>
-              )}
             </form>
           </div>
         </section>

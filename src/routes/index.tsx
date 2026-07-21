@@ -145,7 +145,7 @@ function DawnScene() {
 
       <div
         className="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-7xl items-center px-4 pb-20 pt-12 sm:px-6"
-        style={{ zIndex: 1000, WebkitTransform: "translateZ(0)", color: "#ffffff" }}
+        style={{ zIndex: 10, WebkitTransform: "translateZ(0)", color: "#ffffff" }}
       >
         <div className="w-full max-w-4xl pt-8">
           <h1 className="w-full max-w-6xl font-serif text-5xl font-medium leading-[1.08] tracking-normal text-white sm:text-6xl sm:leading-[1.04] lg:text-7xl xl:text-8xl">

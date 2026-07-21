@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { type FormEvent, useState } from "react";
-import { LockKeyhole, Router, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ShieldCheck } from "lucide-react";
+import navMarkSrc from "@/assets/brand/nav-mark.png";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/dawn-gate-9vK2mQ7p")({
@@ -49,72 +50,59 @@ function AdminLogin() {
       return;
     }
 
+    const redirectTo =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("redirect")
+        : null;
+
+    if (redirectTo) {
+      window.location.assign(redirectTo);
+      return;
+    }
+
     await navigate({ to: "/dashboard" });
   };
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#fff7e9] p-4 text-foreground dark:bg-[#17131f]">
+    <div className="min-h-screen bg-[linear-gradient(180deg,#fffaf2_0%,#fae4b7_40%,#f1ad78_72%,#fff0dc_100%)] text-foreground">
       <div
-        className="absolute inset-0 bg-[linear-gradient(180deg,#fffaf1_0%,#f5daa6_42%,#eba86f_76%,#fff1dc_100%)] dark:bg-[linear-gradient(180deg,#17131f_0%,#262131_40%,#5a3d49_72%,#17131f_100%)]"
+        className="absolute inset-x-0 bottom-0 h-[42vh] bg-[linear-gradient(180deg,transparent_0%,rgba(255,247,233,0.78)_74%,#fff7e9_100%)]"
         aria-hidden="true"
       />
-      <div
-        className="absolute inset-x-0 bottom-0 h-[42vh] bg-[linear-gradient(180deg,transparent_0%,rgba(255,247,233,0.78)_74%,#fff7e9_100%)] dark:bg-[linear-gradient(180deg,transparent_0%,rgba(23,19,31,0.72)_58%,#17131f_100%)]"
-        aria-hidden="true"
-      />
-      <main className="relative w-full max-w-md rounded-2xl border border-white/70 bg-[#fffaf1]/94 p-7 shadow-[0_36px_110px_-70px_rgba(95,59,36,0.9)] backdrop-blur-xl dark:border-white/10 dark:bg-[#221d2b]/92 dark:shadow-[0_36px_110px_-70px_rgba(0,0,0,1)]">
-        <div className="mb-7 flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#4f332b] text-white dark:bg-[#f4bd78] dark:text-[#241f2f]">
-            <Router className="h-6 w-6" />
-          </div>
-          <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary">
-              Private gateway
-            </p>
-            <h1 className="font-serif text-2xl text-foreground">Admin Login</h1>
-          </div>
-        </div>
+      <main className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-7 sm:px-6">
+        <a
+          href="/"
+          className="inline-flex w-fit items-center gap-2 rounded-full border border-white/75 bg-white/45 px-4 py-2 text-sm font-medium text-[#51372f] shadow-sm backdrop-blur transition hover:bg-white/70"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Home
+        </a>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          {error && (
-            <div className="rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</div>
-          )}
-          <label className="block text-sm font-semibold text-foreground">
-            Email / username
-            <input
-              type="text"
-              required
-              autoComplete="username"
-              className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/10"
-              value={username}
-              onChange={(event) => setUsername(event.target.value)}
-            />
-          </label>
-          <label className="block text-sm font-semibold text-foreground">
-            Password
-            <input
-              type="password"
-              required
-              autoComplete="current-password"
-              className="mt-2 w-full rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-4 focus:ring-primary/10"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-            />
-          </label>
-          <button
-            type="submit"
-            disabled={loading}
-            className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#4f332b] px-5 py-3 font-medium text-white transition hover:bg-primary disabled:opacity-60 dark:bg-[#f4bd78] dark:text-[#241f2f] dark:hover:bg-[#ffd28c]"
-          >
-            {loading ? "Authenticating..." : "Login"}
-            <ShieldCheck className="h-4 w-4" />
-          </button>
-        </form>
+        <section className="flex flex-1 items-center justify-center py-10 sm:py-14">
+          <div className="relative w-full max-w-[560px] before:absolute before:inset-x-4 before:top-4 before:-bottom-4 before:bg-[#e89e5e]/20 before:content-[''] sm:before:inset-x-5 sm:before:top-5 sm:before:-bottom-5">
+            <form onSubmit={handleLogin} className="relative rounded-[1.65rem] border border-white/75 bg-[#fffaf1]/92 px-6 py-8 shadow-[0_34px_100px_-65px_rgba(94,55,33,0.9)] backdrop-blur-xl sm:px-8 sm:py-10">
+              <div className="mx-auto mb-2 flex w-fit items-center gap-3 bg-[#fff7e7]/80 px-4 py-3">
+                <img src={navMarkSrc} alt="" className="h-10 w-auto max-w-[96px] object-contain" draggable={false} />
+                <span className="brand-script text-[1.45rem] leading-none text-[#4f332b]">A&apos;New Dawn</span>
+              </div>
+              <h1 className="mb-6 text-center font-serif text-4xl leading-tight text-[#4f332b]">Admin Login</h1>
 
-        <p className="mt-6 flex items-center gap-2 text-xs text-muted-foreground">
-          <LockKeyhole className="h-3.5 w-3.5" />
-          No public signup. Authorized users only.
-        </p>
+              {error && <div className="mb-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{error}</div>}
+              <label className="block text-sm font-semibold text-foreground">
+                Email
+                <input type="email" required autoComplete="username" className="mt-2 w-full rounded-xl border border-[#e7d9c5] bg-white/80 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10" value={username} onChange={(event) => setUsername(event.target.value)} />
+              </label>
+              <label className="mt-4 block text-sm font-semibold text-foreground">
+                Password
+                <input type="password" required autoComplete="current-password" className="mt-2 w-full rounded-xl border border-[#e7d9c5] bg-white/80 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10" value={password} onChange={(event) => setPassword(event.target.value)} />
+              </label>
+              <button type="submit" disabled={loading} className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:opacity-60">
+                {loading ? "Authenticating..." : "Login"}
+                <ShieldCheck className="h-4 w-4" />
+              </button>
+            </form>
+          </div>
+        </section>
       </main>
     </div>
   );
