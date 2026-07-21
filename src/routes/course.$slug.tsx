@@ -67,6 +67,41 @@ type Lesson = {
   prompts: string[];
 };
 
+type ReadingSection = { heading: string; body: string; prompts?: string[] };
+
+const lessonReadings: Record<string, ReadingSection[]> = {
+  welcome: [
+    { heading: "Awareness", body: "Awareness is the beginning of clarity. Notice your current mindset, habits, and the areas of life asking for strength or change. This is a space for clarity, not judgment.", prompts: ["Who am I?", "What impact do I want my life to have?", "What areas of my life feel unclear or stagnant?"] },
+    { heading: "Life Areas Check-In", body: "Personal growth, mental health, relationships, career or purpose, finances, physical health, spiritual life, and confidence all tell part of the story.", prompts: ["Which areas score the lowest?", "Which area surprised you?", "What patterns do you notice?"] },
+    { heading: "Daily Awareness Practice", body: "Write down what you thought about most today, what habits helped or hurt your growth, and what emotions you felt.", prompts: ["What did today’s awareness reveal about the direction of your life?"] },
+  ],
+  journey: [
+    { heading: "Who Is Occupying Your Mind?", body: "Identify the person or situation taking up the most space in your mind. Awareness creates separation, and separation creates power.", prompts: ["How often do they come to mind?", "What triggers these thoughts?", "What feels unresolved here?"] },
+    { heading: "Energy Audit", body: "Name what this mental occupation is costing you: time, emotional energy, focus, productivity, or self-worth. Then name what it is adding to your life, if anything.", prompts: ["If nothing changed with this person, would your life still move forward?"] },
+    { heading: "Take Your Power Back", body: "Choose release or realignment. You can release an expectation, memory, or version of someone—or choose one clear conversation or boundary.", prompts: ["I release ___ because I deserve ___.", "What will I give my focus to instead?"] },
+  ],
+  "faith-centered": [
+    { heading: "What Alignment Means", body: "Alignment is when what you think matches what you believe, what you believe matches how you feel, and what you feel matches what you do. Alignment creates clarity, peace, confidence, and forward momentum." },
+    { heading: "Alignment Check-In", body: "Notice what feels off, where you are forcing something, and what you are tolerating that does not reflect who you want to be.", prompts: ["What is my truth in this situation?", "What would the highest version of me choose?", "What is one action I can take today to realign?"] },
+    { heading: "Final Reflection", body: "Alignment is when your life reflects your truth—not your fear, past, or other people’s expectations.", prompts: ["What shifted for you during this exercise?"] },
+  ],
+  "awareness-release": [
+    { heading: "Mindset Renewal", body: "Mindset renewal is the intentional process of resetting how you think, perceive, and respond, so your thoughts start working for you instead of against you." },
+    { heading: "Release and Reframe", body: "Release old identities, past failures, and other people’s perceptions. Choose a more powerful truth that feels possible, not fake.", prompts: ["What belief have I outgrown but still carry?", "What is a more empowering truth?", "What do I choose to believe now?"] },
+    { heading: "Rebuild and Reinforce", body: "Create intentional beliefs around identity, capability, and future. Reinforce them through affirmation, journaling, visualization, and aligned action.", prompts: ["What action will prove this belief today?", "What did I think differently today?"] },
+  ],
+  "alignment-receive": [
+    { heading: "Goal Execution", body: "Clear goals make execution lighter. Define what you want, why it matters spiritually and practically, and who you become as you achieve it." },
+    { heading: "Make It Real", body: "Break a big goal into monthly targets, weekly actions, and daily non-negotiables. Execution is not motivation—it is structure.", prompts: ["What is my 90-day power goal?", "What does success look like?", "What are my daily non-negotiables?"] },
+    { heading: "Weekly Reflection", body: "Notice what you executed well, where you hesitated, what you learned, and what you will elevate next week.", prompts: ["What is one bold action I will complete today?"] },
+  ],
+  "wisdom-respond": [
+    { heading: "Integration", body: "Ideas become reality by doing the right things in the right order with intention: aligned decisions, focused execution, and measurable outcomes." },
+    { heading: "Strategic Plan", body: "Get clear on your outcome, your current position, and the high-impact actions that move you forward. Structure beats motivation.", prompts: ["What area of my life is asking for structure right now?", "What is my desired outcome?", "What are three high-impact actions?"] },
+    { heading: "Commitment", body: "Expect obstacles, prepare for resistance, and adjust rather than quit. Your life changes through what you execute consistently.", prompts: ["What is my weekly commitment?", "On a scale of 1–10, how committed am I?"] },
+  ],
+};
+
 type CurriculumSection = {
   id: string;
   title: string;
@@ -95,10 +130,10 @@ const curriculum: CurriculumSection[] = [
       {
         id: "welcome",
         sectionId: "foundations",
-        title: "Welcome to A New Dawn",
-        subtitle: "Start here",
+        title: "Welcome to A New Dawn: Awareness",
+        subtitle: "Begin with clarity, not judgment.",
         duration: "08:20",
-        description: "Meet the coaching container and orient yourself to the course experience.",
+        description: "Start by noticing your mindset, habits, identity, and the areas of life asking for clarity.",
         prompts: ["What are you hoping this course helps you name more clearly?"],
       },
       {
@@ -397,10 +432,9 @@ function CoursePage() {
     downloadedMaterials: [],
     respondedPrompts: [],
   };
-  const lessonTaskCount = 2 + activeLesson.prompts.length;
+  const lessonTaskCount = 1 + activeLesson.prompts.length;
   const completedLessonTaskCount =
-    (activeActivity.videoWatched ? 1 : 0) +
-    (activeActivity.downloadedMaterials.length >= documentMaterials.length ? 1 : 0) +
+    1 +
     activeLesson.prompts.filter((prompt) => activeActivity.respondedPrompts.includes(prompt)).length;
   const lessonProgressPercent = Math.round((completedLessonTaskCount / lessonTaskCount) * 100);
   const lessonReadyToComplete = lessonProgressPercent === 100;
@@ -462,6 +496,7 @@ function CoursePage() {
 
     return documentMaterials;
   }, [course]);
+  const readingSections = lessonReadings[activeLesson.id] || [];
 
   const toggleProgress = async (itemKey: string) => {
     if (!course || savingItemKey) return;
@@ -881,16 +916,14 @@ function CoursePage() {
                 </div>
                 <div className="mt-3 grid gap-2 text-xs text-[#746174] sm:grid-cols-3">
                   <span className={activeActivity.videoWatched ? "font-semibold text-[#4f7d5b]" : ""}>
-                    {activeActivity.videoWatched ? "✓" : "○"} Watch video
+                    ✓ Read lesson
                   </span>
                   <span
                     className={
-                      activeActivity.downloadedMaterials.length >= documentMaterials.length
-                        ? "font-semibold text-[#4f7d5b]"
-                        : ""
+                      "font-semibold text-[#4f7d5b]"
                     }
                   >
-                    {activeActivity.downloadedMaterials.length >= documentMaterials.length ? "✓" : "○"} Download worksheets
+                    ✓ Explore exercises
                   </span>
                   <span
                     className={
@@ -912,28 +945,30 @@ function CoursePage() {
               </div>
             </section>
 
-            <section className="mt-6 overflow-hidden rounded-2xl border border-[#d8a890] bg-[#eeb07c] shadow-[0_20px_60px_-42px_rgba(75,35,35,0.8)]">
-              <button
-                type="button"
-                onClick={markVideoWatched}
-                className="group relative flex min-h-[240px] w-full items-center gap-10 overflow-hidden bg-[linear-gradient(160deg,rgba(243,206,189,0.85),rgba(255,178,95,0.78)),radial-gradient(circle_at_78%_65%,rgba(255,247,218,0.9),transparent_16%),linear-gradient(180deg,transparent_48%,rgba(88,42,61,0.34)_82%)] px-8 text-left"
-              >
-                <div className="absolute inset-x-0 bottom-0 h-24 bg-[radial-gradient(ellipse_at_50%_100%,rgba(80,45,68,0.45),transparent_72%)]" />
-                <span className="relative z-10 flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-white/86 text-[#44204a] shadow-[0_18px_50px_-30px_rgba(0,0,0,0.8)] transition group-hover:scale-105">
-                  <Play className="ml-1 h-10 w-10 fill-current" />
-                </span>
-                <span className="relative z-10">
-                  <span className="block font-serif text-4xl text-[#4a284f]">{activeLesson.title}</span>
-                  <span className="mt-3 block text-sm font-semibold text-[#4f354f]">
-                    {activeActivity.videoWatched ? "Video opened" : "Lesson Video"}
-                  </span>
-                  <span className="mt-2 flex items-center gap-2 text-sm text-[#5d4a59]">
-                    <Clock3 className="h-4 w-4" />
-                    {activeLesson.duration}
-                  </span>
-                </span>
-              </button>
-            </section>
+            {readingSections.length > 0 && (
+              <section className="mt-6 space-y-5" aria-label="Lesson reading">
+                {readingSections.map((section) => (
+                  <article key={section.heading} className="rounded-2xl border border-[#ead5c2] bg-white/70 p-6 shadow-[0_18px_55px_-46px_rgba(67,35,55,0.8)]">
+                    <h2 className="font-serif text-2xl text-[#4a284f]">{section.heading}</h2>
+                    <p className="mt-3 text-[1rem] leading-8 text-[#4f4654] [word-spacing:0.08em]">
+                      {section.body.split(/(\s+)/).map((part, index) =>
+                        /^\s+$/.test(part) ? part : <span key={`${part}-${index}`} className="cursor-text rounded-sm transition-colors duration-150 hover:bg-[#ffe4bd] hover:text-[#b85d19]">{part}</span>,
+                      )}
+                    </p>
+                    {section.prompts && (
+                      <div className="mt-5 space-y-2 border-t border-[#f0e2d3] pt-4">
+                        {section.prompts.map((prompt) => (
+                          <button key={prompt} type="button" onClick={() => markPromptResponded(prompt)} className="flex w-full items-center gap-3 rounded-xl bg-[#fff7ed] px-4 py-3 text-left text-sm text-[#4b3a4d] transition hover:bg-[#fff0dc]">
+                            <Leaf className="h-4 w-4 shrink-0 text-[#ef824a]" />
+                            {prompt}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </article>
+                ))}
+              </section>
+            )}
 
             <section className="mt-7">
               <div className="flex items-start gap-3">
