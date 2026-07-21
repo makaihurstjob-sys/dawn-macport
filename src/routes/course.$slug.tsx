@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   Bell,
+  BookOpen,
   Check,
   ChevronDown,
   ChevronLeft,
@@ -120,6 +121,15 @@ type LessonActivity = {
   videoWatched: boolean;
   downloadedMaterials: string[];
   respondedPrompts: string[];
+};
+
+type JournalEntry = {
+  id: string;
+  lessonId: string;
+  lessonTitle: string;
+  prompt: string;
+  content: string;
+  createdAt: string;
 };
 
 const curriculum: CurriculumSection[] = [
@@ -350,6 +360,10 @@ function CoursePage() {
   ]);
   const [resourcesExpanded, setResourcesExpanded] = useState(false);
   const [zoomMeetingsExpanded, setZoomMeetingsExpanded] = useState(false);
+  const [journalOpen, setJournalOpen] = useState(false);
+  const [journalEntries, setJournalEntries] = useState<JournalEntry[]>([]);
+  const [activePrompt, setActivePrompt] = useState<string | null>(null);
+  const [journalDraft, setJournalDraft] = useState("");
 
   useEffect(() => {
     const loadCourse = async () => {
@@ -478,25 +492,34 @@ function CoursePage() {
         ...material,
         url: matchingResource?.url || material.url || null,
       };
-    });
+    }).filter((material) => Boolean(material.url));
   }, [course]);
 
   const courseResources = useMemo<CourseMaterial[]>(() => {
     const databaseResources = course?.course_resources || [];
-
-    if (databaseResources.length > 0) {
-      return databaseResources.map((resource) => ({
+    return databaseResources
+      .filter((resource) => Boolean(resource.url))
+      .map((resource) => ({
         title: resource.title,
         description: resource.description || "Course resource",
         size: "",
         source: resource.title,
         url: resource.url,
       }));
-    }
-
-    return documentMaterials;
   }, [course]);
   const readingSections = lessonReadings[activeLesson.id] || [];
+  const journalStorageKey = course ? `dawn-journal:${course.id}:${userId || "demo"}` : "";
+
+  useEffect(() => {
+    if (!journalStorageKey) return;
+
+    try {
+      const savedEntries = window.localStorage.getItem(journalStorageKey);
+      setJournalEntries(savedEntries ? (JSON.parse(savedEntries) as JournalEntry[]) : []);
+    } catch {
+      setJournalEntries([]);
+    }
+  }, [journalStorageKey]);
 
   const toggleProgress = async (itemKey: string) => {
     if (!course || savingItemKey) return;
@@ -585,6 +608,39 @@ function CoursePage() {
       ...current,
       respondedPrompts: Array.from(new Set([...current.respondedPrompts, prompt])),
     }));
+  };
+
+  const openJournalPrompt = (prompt: string) => {
+    const existingEntry = journalEntries.find(
+      (entry) => entry.lessonId === activeLesson.id && entry.prompt === prompt,
+    );
+    setActivePrompt(prompt);
+    setJournalDraft(existingEntry?.content || "");
+  };
+
+  const saveJournalEntry = () => {
+    if (!activePrompt || !journalDraft.trim() || !journalStorageKey) return;
+
+    const existingEntry = journalEntries.find(
+      (entry) => entry.lessonId === activeLesson.id && entry.prompt === activePrompt,
+    );
+    const entry: JournalEntry = {
+      id: existingEntry?.id || `${activeLesson.id}-${Date.now()}`,
+      lessonId: activeLesson.id,
+      lessonTitle: activeLesson.title,
+      prompt: activePrompt,
+      content: journalDraft.trim(),
+      createdAt: existingEntry?.createdAt || new Date().toISOString(),
+    };
+    const nextEntries = existingEntry
+      ? journalEntries.map((current) => (current.id === existingEntry.id ? entry : current))
+      : [entry, ...journalEntries];
+
+    setJournalEntries(nextEntries);
+    window.localStorage.setItem(journalStorageKey, JSON.stringify(nextEntries));
+    markPromptResponded(activePrompt);
+    setActivePrompt(null);
+    setJournalDraft("");
   };
 
   const completeLessonAndRecommendNext = async () => {
@@ -803,8 +859,21 @@ function CoursePage() {
                 </div>
               )}
             </div>
+
+            <button
+              type="button"
+              onClick={() => setJournalOpen(true)}
+              className="flex w-full items-center justify-between rounded-xl border border-[#ead5c2] bg-[#fff8ef] px-3 py-3 text-left transition hover:bg-[#fff1e3]"
+            >
+              <span className="flex items-center gap-3 text-sm font-semibold text-[#4a284f]">
+                <BookOpen className="h-4 w-4 text-[#ef824a]" />
+                D.A.W.N. Journal
+              </span>
+              <ChevronRight className="h-4 w-4 text-[#766776]" />
+            </button>
           </nav>
 
+          {courseResources.length > 0 && (
           <div className="p-6">
             <button
               type="button"
@@ -824,31 +893,26 @@ function CoursePage() {
                   const contents = (
                     <>
                       <span className="block truncate text-xs font-semibold text-[#4a284f]">{resource.title}</span>
-                      <span className="mt-0.5 block truncate text-[0.69rem] text-[#827482]">
-                        {resource.url ? "Open resource" : resource.description}
-                      </span>
+                      <span className="mt-0.5 block truncate text-[0.69rem] text-[#827482]">Open resource</span>
                     </>
                   );
 
-                  return resource.url ? (
+                  return (
                     <a
                       key={resource.title}
-                      href={resource.url}
+                      href={resource.url!}
                       target="_blank"
                       rel="noreferrer"
                       className="block rounded-lg px-2.5 py-2 transition hover:bg-[#fff1e3]"
                     >
                       {contents}
                     </a>
-                  ) : (
-                    <div key={resource.title} className="rounded-lg px-2.5 py-2">
-                      {contents}
-                    </div>
                   );
                 })}
               </div>
             )}
           </div>
+          )}
         </div>
       </aside>
 
@@ -958,7 +1022,7 @@ function CoursePage() {
                     {section.prompts && (
                       <div className="mt-5 space-y-2 border-t border-[#f0e2d3] pt-4">
                         {section.prompts.map((prompt) => (
-                          <button key={prompt} type="button" onClick={() => markPromptResponded(prompt)} className="flex w-full items-center gap-3 rounded-xl bg-[#fff7ed] px-4 py-3 text-left text-sm text-[#4b3a4d] transition hover:bg-[#fff0dc]">
+                          <button key={prompt} type="button" onClick={() => openJournalPrompt(prompt)} className="flex w-full items-center gap-3 rounded-xl bg-[#fff7ed] px-4 py-3 text-left text-sm text-[#4b3a4d] transition hover:bg-[#fff0dc]">
                             <Leaf className="h-4 w-4 shrink-0 text-[#ef824a]" />
                             {prompt}
                           </button>
@@ -970,6 +1034,7 @@ function CoursePage() {
               </section>
             )}
 
+            {materials.length > 0 && (
             <section className="mt-7">
               <div className="flex items-start gap-3">
                 <FileText className="mt-1 h-5 w-5 text-[#6d3d65]" />
@@ -1001,33 +1066,23 @@ function CoursePage() {
                         {material.title}
                       </h3>
                       <p className="mt-2 text-xs text-[#827482]">{material.description}</p>
-                      {material.url ? (
-                        <a
-                          href={material.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          onClick={() => markMaterialDownloaded(material.title)}
-                          className="mt-3 inline-flex items-center gap-2 rounded-md border border-[#efc9ac] bg-[#fff1e3] px-4 py-2 text-xs font-semibold text-[#b55d0e]"
-                        >
-                          {downloaded ? <Check className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
-                          {downloaded ? "Downloaded" : "Download"}
-                        </a>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => markMaterialDownloaded(material.title)}
-                          className="mt-3 inline-flex items-center gap-2 rounded-md border border-[#efc9ac] bg-[#fff1e3] px-4 py-2 text-xs font-semibold text-[#b55d0e]"
-                        >
-                          {downloaded ? <Check className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
-                          {downloaded ? "Downloaded" : "Download"}
-                        </button>
-                      )}
+                      <a
+                        href={material.url!}
+                        target="_blank"
+                        rel="noreferrer"
+                        onClick={() => markMaterialDownloaded(material.title)}
+                        className="mt-3 inline-flex items-center gap-2 rounded-md border border-[#efc9ac] bg-[#fff1e3] px-4 py-2 text-xs font-semibold text-[#b55d0e]"
+                      >
+                        {downloaded ? <Check className="h-3.5 w-3.5" /> : <Download className="h-3.5 w-3.5" />}
+                        {downloaded ? "Downloaded" : "Download"}
+                      </a>
                     </div>
                   </article>
                   );
                 })}
               </div>
             </section>
+            )}
 
             <section className="mt-7 pb-12">
               <div className="flex items-start gap-3">
@@ -1046,7 +1101,7 @@ function CoursePage() {
                   <button
                     key={prompt}
                     type="button"
-                    onClick={() => markPromptResponded(prompt)}
+                    onClick={() => openJournalPrompt(prompt)}
                     className="flex w-full items-center gap-5 rounded-xl border border-[#ead5c2] bg-[#fffaf4] px-4 py-3 text-left shadow-[0_14px_42px_-40px_rgba(67,35,55,0.8)]"
                   >
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-[#fff1e3] text-[#ee7c55]">
@@ -1061,6 +1116,33 @@ function CoursePage() {
                   );
                 })}
               </div>
+
+              {activePrompt && (
+                <div className="mt-4 rounded-2xl border border-[#efc9ac] bg-[#fff8ef] p-5 shadow-[0_18px_55px_-42px_rgba(67,35,55,0.8)]">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#c36d15]">D.A.W.N. Journal</p>
+                      <h3 className="mt-1 font-serif text-xl text-[#4a284f]">{activePrompt}</h3>
+                    </div>
+                    <BookOpen className="h-5 w-5 shrink-0 text-[#ef824a]" />
+                  </div>
+                  <textarea
+                    value={journalDraft}
+                    onChange={(event) => setJournalDraft(event.target.value)}
+                    placeholder="Write what is true for you right now..."
+                    className="mt-4 min-h-36 w-full resize-y rounded-xl border border-[#ead5c2] bg-white px-4 py-3 text-sm leading-6 text-[#4b3a4d] outline-none transition placeholder:text-[#a89aa6] focus:border-[#ef824a] focus:ring-4 focus:ring-[#ef824a]/10"
+                  />
+                  <div className="mt-4 flex flex-wrap justify-end gap-3">
+                    <button type="button" onClick={() => { setActivePrompt(null); setJournalDraft(""); }} className="rounded-xl px-4 py-2 text-sm font-semibold text-[#766776] transition hover:bg-[#fff1e3]">
+                      Cancel
+                    </button>
+                    <button type="button" onClick={saveJournalEntry} disabled={!journalDraft.trim()} className="inline-flex items-center gap-2 rounded-xl bg-[#4a2d24] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#ef824a] disabled:cursor-not-allowed disabled:opacity-50">
+                      <BookOpen className="h-4 w-4" />
+                      Save to Journal
+                    </button>
+                  </div>
+                </div>
+              )}
             </section>
           </div>
         </main>
@@ -1113,6 +1195,47 @@ function CoursePage() {
                 <ChevronRight className="h-5 w-5" />
               </button>
             )}
+          </section>
+        </div>
+      )}
+
+      {journalOpen && (
+        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-[#321d38]/24 px-4 py-6 backdrop-blur-sm sm:items-center">
+          <section className="max-h-[min(82vh,46rem)] w-full max-w-2xl overflow-hidden rounded-3xl border border-[#ead0ba] bg-[#fffaf4] shadow-[0_28px_90px_-42px_rgba(54,30,45,0.9)]">
+            <div className="flex items-start justify-between gap-4 border-b border-[#ead9c7] px-6 py-5">
+              <div className="flex items-center gap-3">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#fff1e3] text-[#ef824a]">
+                  <BookOpen className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#c36d15]">Your reflections</p>
+                  <h2 className="font-serif text-2xl text-[#4a284f]">D.A.W.N. Journal</h2>
+                </div>
+              </div>
+              <button type="button" onClick={() => setJournalOpen(false)} className="rounded-xl px-3 py-2 text-sm font-semibold text-[#766776] transition hover:bg-[#fff1e3]">
+                Close
+              </button>
+            </div>
+            <div className="max-h-[calc(min(82vh,46rem)-6.5rem)] space-y-4 overflow-y-auto p-6">
+              {journalEntries.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-[#ead5c2] bg-white/70 px-5 py-10 text-center">
+                  <BookOpen className="mx-auto h-7 w-7 text-[#ef824a]" />
+                  <p className="mt-3 font-serif text-xl text-[#4a284f]">Your journal is ready when you are.</p>
+                  <p className="mt-2 text-sm leading-6 text-[#766776]">Save a reflection from any lesson and it will be collected here.</p>
+                </div>
+              ) : (
+                journalEntries.map((entry) => (
+                  <article key={entry.id} className="rounded-2xl border border-[#ead5c2] bg-white/75 p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-semibold uppercase tracking-[0.12em] text-[#c36d15]">
+                      <span>{entry.lessonTitle}</span>
+                      <span>{new Date(entry.createdAt).toLocaleDateString()}</span>
+                    </div>
+                    <h3 className="mt-3 font-serif text-lg text-[#4a284f]">{entry.prompt}</h3>
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-[#4f4654]">{entry.content}</p>
+                  </article>
+                ))
+              )}
+            </div>
           </section>
         </div>
       )}
