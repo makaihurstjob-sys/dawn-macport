@@ -144,7 +144,7 @@ function BookingPage() {
         <div className="flex flex-1 items-center justify-center py-8">
           <section className="w-full">
             <div className="mx-auto mb-8 max-w-2xl text-center text-white">
-              <h1 className="brand-kicker font-serif text-4xl font-medium leading-[1.08] text-[#fff8ea] sm:text-5xl">
+              <h1 className="font-sans text-4xl font-semibold leading-[1.08] text-[#fff8ea] sm:text-5xl">
                 Begin here
               </h1>
               <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-white/78 sm:text-lg">
