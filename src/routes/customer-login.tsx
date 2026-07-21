@@ -1,10 +1,20 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { type FormEvent, useEffect, useMemo, useState } from "react";
 import { ArrowLeft, UserRoundCheck } from "lucide-react";
 import navMarkSrc from "@/assets/brand/nav-mark.png";
+import { getCustomerAuthState } from "@/lib/customer-auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/customer-login")({
+  beforeLoad: async ({ location }) => {
+    const { isCustomer } = await getCustomerAuthState();
+    if (!isCustomer) return;
+
+    const redirectPath = new URL(location.href).searchParams.get("redirect");
+    throw redirect({
+      to: redirectPath?.startsWith("/") ? redirectPath : "/app",
+    });
+  },
   component: CustomerLogin,
 });
 
