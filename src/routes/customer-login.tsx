@@ -70,6 +70,7 @@ function CustomerLogin() {
   const [error, setError] = useState("");
   const [linkStatus, setLinkStatus] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showEmailLinkOption, setShowEmailLinkOption] = useState(false);
 
   useEffect(() => {
     if (inviteCallback.errorMessage) {
@@ -110,6 +111,7 @@ function CustomerLogin() {
 
     if (signInError) {
       setError(signInError.message);
+      setShowEmailLinkOption(true);
       setLoading(false);
       return;
     }
@@ -127,6 +129,33 @@ function CustomerLogin() {
     }
 
     await navigate({ to: redirectPath });
+  };
+
+  const sendSecureSignInLink = async () => {
+    if (!email.trim()) {
+      setError("Enter your email address first, then we can send your secure link.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    setLinkStatus("");
+
+    const { error: linkError } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: {
+        emailRedirectTo: `${window.location.origin}${redirectPath}`,
+      },
+    });
+
+    setLoading(false);
+
+    if (linkError) {
+      setError(linkError.message);
+      return;
+    }
+
+    setLinkStatus("Your secure sign-in link is on its way. Open it from your email to continue to your course.");
   };
 
   const handlePasswordSetup = async (event: FormEvent<HTMLFormElement>) => {
@@ -269,6 +298,17 @@ function CustomerLogin() {
                     : "Login"}
                 <UserRoundCheck className="h-4 w-4" />
               </button>
+
+              {!isSettingPassword && showEmailLinkOption && (
+                <button
+                  type="button"
+                  onClick={sendSecureSignInLink}
+                  disabled={loading}
+                  className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-[#d8bda0] bg-white/65 px-5 py-3 text-sm font-semibold text-[#704b37] transition hover:bg-white disabled:opacity-60"
+                >
+                  Send a secure sign-in link to my email
+                </button>
+              )}
             </form>
           </div>
         </section>
