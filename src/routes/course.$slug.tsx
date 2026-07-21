@@ -301,7 +301,9 @@ function CoursePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [savingItemKey, setSavingItemKey] = useState("");
-  const [activeLessonId, setActiveLessonId] = useState("awareness-release");
+  // Every new course visit starts at the welcome lesson. Learners can still use
+  // the course progress menu to return to any lesson they have already opened.
+  const [activeLessonId, setActiveLessonId] = useState("welcome");
   const [lessonActivity, setLessonActivity] = useState<Record<string, LessonActivity>>({});
   const [nearLessonEnd, setNearLessonEnd] = useState(false);
   const [completionPhase, setCompletionPhase] = useState<"idle" | "saving" | "ready-next">("idle");
@@ -311,6 +313,8 @@ function CoursePage() {
     "dawn-method",
     "tools",
   ]);
+  const [resourcesExpanded, setResourcesExpanded] = useState(false);
+  const [zoomMeetingsExpanded, setZoomMeetingsExpanded] = useState(false);
 
   useEffect(() => {
     const loadCourse = async () => {
@@ -382,7 +386,7 @@ function CoursePage() {
     [progress],
   );
 
-  const activeLesson = allLessons.find((lesson) => lesson.id === activeLessonId) || allLessons[3];
+  const activeLesson = allLessons.find((lesson) => lesson.id === activeLessonId) || allLessons[0];
   const activeSectionIndex = curriculum.findIndex((section) => section.id === activeLesson.sectionId);
   const activeLessonIndex = allLessons.findIndex((lesson) => lesson.id === activeLesson.id);
   const nextLesson = allLessons[activeLessonIndex + 1];
@@ -441,6 +445,22 @@ function CoursePage() {
         url: matchingResource?.url || material.url || null,
       };
     });
+  }, [course]);
+
+  const courseResources = useMemo<CourseMaterial[]>(() => {
+    const databaseResources = course?.course_resources || [];
+
+    if (databaseResources.length > 0) {
+      return databaseResources.map((resource) => ({
+        title: resource.title,
+        description: resource.description || "Course resource",
+        size: "",
+        source: resource.title,
+        url: resource.url,
+      }));
+    }
+
+    return documentMaterials;
   }, [course]);
 
   const toggleProgress = async (itemKey: string) => {
@@ -721,16 +741,78 @@ function CoursePage() {
                 </div>
               );
             })}
+
+            <div className="mb-4">
+              <button
+                type="button"
+                onClick={() => setZoomMeetingsExpanded((current) => !current)}
+                aria-expanded={zoomMeetingsExpanded}
+                className="flex w-full items-center justify-between gap-3 py-1.5 text-left text-sm font-semibold text-[#321d38]"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#4a2854]" />
+                  <span>6. Zoom Meetings</span>
+                </span>
+                <ChevronDown className={`h-4 w-4 transition-transform ${zoomMeetingsExpanded ? "" : "-rotate-90"}`} />
+              </button>
+
+              {zoomMeetingsExpanded && (
+                <div className="mt-2 rounded-xl border border-[#ead5c2] bg-[#fff8ef] p-3 text-xs leading-5 text-[#6f6470]">
+                  <span className="flex items-center gap-2 font-semibold text-[#4a284f]">
+                    <Video className="h-4 w-4 text-[#ef824a]" />
+                    Live coaching sessions
+                  </span>
+                  <p className="mt-2">
+                    Your coach will add your upcoming Zoom session here. When it is scheduled, you will be able to join from this protected portal.
+                  </p>
+                </div>
+              )}
+            </div>
           </nav>
 
           <div className="p-6">
-            <button className="flex w-full items-center justify-between rounded-xl border border-[#ead9c7] bg-[#fff8ef] px-4 py-4 text-sm text-[#4f3d50]">
+            <button
+              type="button"
+              onClick={() => setResourcesExpanded((current) => !current)}
+              aria-expanded={resourcesExpanded}
+              className="flex w-full items-center justify-between rounded-xl border border-[#ead9c7] bg-[#fff8ef] px-4 py-4 text-sm text-[#4f3d50]"
+            >
               <span className="flex items-center gap-3">
                 <Folder className="h-5 w-5" />
                 Course Resources
               </span>
-              <ChevronRight className="h-4 w-4" />
+              <ChevronDown className={`h-4 w-4 transition-transform ${resourcesExpanded ? "rotate-180" : ""}`} />
             </button>
+            {resourcesExpanded && (
+              <div className="mt-2 max-h-52 space-y-2 overflow-y-auto rounded-xl border border-[#ead9c7] bg-white p-2">
+                {courseResources.map((resource) => {
+                  const contents = (
+                    <>
+                      <span className="block truncate text-xs font-semibold text-[#4a284f]">{resource.title}</span>
+                      <span className="mt-0.5 block truncate text-[0.69rem] text-[#827482]">
+                        {resource.url ? "Open resource" : resource.description}
+                      </span>
+                    </>
+                  );
+
+                  return resource.url ? (
+                    <a
+                      key={resource.title}
+                      href={resource.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="block rounded-lg px-2.5 py-2 transition hover:bg-[#fff1e3]"
+                    >
+                      {contents}
+                    </a>
+                  ) : (
+                    <div key={resource.title} className="rounded-lg px-2.5 py-2">
+                      {contents}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
       </aside>
