@@ -1147,8 +1147,8 @@ function CustomersCoursesView({
 
   return (
     <section className="space-y-5">
-      <div className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+      <div className="grid items-stretch gap-5 xl:grid-cols-[0.95fr_1.05fr]">
+        <div className="flex min-h-[30.25rem] flex-col rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
           <div className="mb-6 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <UserPlus className="h-5 w-5" />
@@ -1210,14 +1210,14 @@ function CustomersCoursesView({
             disabled={
               invitingCustomer || !customerName.trim() || !customerEmail.trim() || !selectedCourseId
             }
-            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-auto inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             {invitingCustomer ? "Sending invite..." : "Send Invite"}
             <UserPlus className="h-4 w-4" />
           </button>
         </div>
 
-        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+        <div className="flex min-h-[30.25rem] flex-col rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
           <div className="mb-6 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <QrCode className="h-5 w-5" />
@@ -1230,7 +1230,7 @@ function CustomersCoursesView({
             </div>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-[1fr_0.9fr]">
+          <div className="grid gap-4 md:grid-cols-2">
             <label className="block text-sm font-semibold text-foreground">
               Short link name
               <input
@@ -1267,7 +1267,7 @@ function CustomersCoursesView({
             type="button"
             onClick={createQrLink}
             disabled={!qrSlug.trim() || !selectedCourseId}
-            className="mt-5 inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="mt-auto inline-flex items-center gap-2 rounded-xl bg-foreground px-5 py-3 font-medium text-background transition hover:bg-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             Save QR Route
             <QrCode className="h-4 w-4" />
