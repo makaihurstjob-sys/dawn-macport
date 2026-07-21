@@ -1568,35 +1568,6 @@ function SettingsView({
         <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
           <div className="mb-5 flex items-center gap-3">
             <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Sun className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                Public website
-              </p>
-              <h3 className="font-serif text-2xl text-foreground">Website theme</h3>
-            </div>
-          </div>
-
-          <div className="rounded-2xl bg-muted/55 p-2">
-            <button
-              type="button"
-              onClick={() => saveWebsiteThemeMode("light")}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-background px-4 py-3 text-sm font-semibold text-foreground shadow-sm"
-              aria-pressed={websiteThemeMode === "light"}
-            >
-              <Sun className="h-4 w-4" />
-              Light only
-            </button>
-          </div>
-          <p className="mt-3 text-sm text-muted-foreground">
-            Dark and system themes are disabled for the public website.
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <Monitor className="h-5 w-5" />
             </div>
             <div>
