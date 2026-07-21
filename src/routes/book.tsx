@@ -144,13 +144,12 @@ function BookingPage() {
         <div className="flex flex-1 items-center justify-center py-8">
           <section className="w-full">
             <div className="mx-auto mb-8 max-w-2xl text-center text-white">
-              <p className="brand-kicker mb-4 text-[#fff8ea]">Begin here</p>
-              <h1 className="font-serif text-4xl font-medium leading-[1.08] sm:text-5xl">
-                Start with three simple questions.
+              <h1 className="brand-kicker font-serif text-4xl font-medium leading-[1.08] text-[#fff8ea] sm:text-5xl">
+                Begin here
               </h1>
               <p className="mx-auto mt-5 max-w-xl text-base leading-7 text-white/78 sm:text-lg">
-                Your answers help shape the best next conversation. After the quiz, the scheduler
-                will open so you can choose a time that works.
+                Answer a few quick questions, then choose a time for us to talk. I&apos;d love to hear
+                where you are and what kind of support would feel most helpful right now.
               </p>
             </div>
 
