@@ -65,6 +65,7 @@ type CustomerEnrollment = Tables<"customer_enrollments"> & {
 type Role = "admin" | "developer" | "customer";
 type View =
   | "overview"
+  | "leads"
   | "contacts"
   | "bookings"
   | "intake"
@@ -74,14 +75,12 @@ type View =
   | "developer";
 
 const navItems: Array<{ id: View; label: string; icon: typeof Home; developerOnly?: boolean }> = [
-  { id: "overview", label: "Overview", icon: Home },
-  { id: "contacts", label: "Contact Messages", icon: Mail },
-  { id: "bookings", label: "Booking Quiz", icon: CalendarCheck },
-  { id: "intake", label: "Survey Entries", icon: ClipboardList },
+  { id: "overview", label: "Dashboard", icon: Home },
+  { id: "leads", label: "Leads", icon: MessageSquareText },
   { id: "customers", label: "Customers / Courses", icon: UsersRound },
   { id: "notes", label: "Notes", icon: NotebookPen },
-  { id: "settings", label: "Settings", icon: Settings },
-  { id: "developer", label: "Developer", icon: Code2, developerOnly: true },
+  { id: "settings", label: "Business Setup", icon: Settings },
+  { id: "developer", label: "Data & Export", icon: Code2, developerOnly: true },
 ];
 
 const websiteThemeOptions: Array<{
@@ -711,11 +710,15 @@ function DashboardPage() {
           {activeView === "overview" && (
             <Overview stats={stats} contacts={contacts} bookings={bookings} intakes={intakes} />
           )}
-          {activeView === "contacts" && <ContactsView contacts={contacts} />}
-          {activeView === "bookings" && (
-            <BookingsView bookings={bookings} deleteBooking={deleteBooking} />
+          {activeView === "leads" && (
+            <LeadsView
+              contacts={contacts}
+              bookings={bookings}
+              intakes={intakes}
+              deleteBooking={deleteBooking}
+              deleteIntake={deleteIntake}
+            />
           )}
-          {activeView === "intake" && <IntakeView intakes={intakes} deleteIntake={deleteIntake} />}
           {activeView === "customers" && (
             <CustomersCoursesView
               courses={courses}
@@ -758,10 +761,6 @@ function DashboardPage() {
               saveCalBookingUrl={saveCalBookingUrl}
               testimonialsEnabled={testimonialsEnabled}
               saveTestimonialsEnabled={saveTestimonialsEnabled}
-              websiteThemeMode={websiteThemeMode}
-              saveWebsiteThemeMode={saveWebsiteThemeMode}
-              dashboardThemeMode={dashboardThemeMode}
-              saveDashboardThemeMode={saveDashboardThemeMode}
               settingsStatus={settingsStatus}
             />
           )}
@@ -888,6 +887,57 @@ function Overview({
         </div>
       </section>
     </div>
+  );
+}
+
+function LeadsView({
+  contacts,
+  bookings,
+  intakes,
+  deleteBooking,
+  deleteIntake,
+}: {
+  contacts: ContactMessage[];
+  bookings: BookingQualification[];
+  intakes: IntakeSubmission[];
+  deleteBooking: (id: string) => void;
+  deleteIntake: (id: string) => void;
+}) {
+  const leadGroups = [
+    { label: "Contact messages", count: contacts.length, content: <ContactsView contacts={contacts} /> },
+    {
+      label: "Booking requests",
+      count: bookings.length,
+      content: <BookingsView bookings={bookings} deleteBooking={deleteBooking} />,
+    },
+    {
+      label: "Intake forms",
+      count: intakes.length,
+      content: <IntakeView intakes={intakes} deleteIntake={deleteIntake} />,
+    },
+  ];
+
+  return (
+    <section className="space-y-4">
+      <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
+        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">Client pipeline</p>
+        <h3 className="mt-2 font-serif text-3xl text-foreground">Leads</h3>
+        <p className="mt-2 text-sm leading-6 text-muted-foreground">
+          Keep every first conversation, booking request, and intake form in one place.
+        </p>
+      </div>
+      {leadGroups.map((group, index) => (
+        <details key={group.label} open={index === 0} className="group rounded-2xl border border-border/70 bg-background shadow-sm">
+          <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left">
+            <span className="font-serif text-2xl text-foreground">{group.label}</span>
+            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-bold uppercase text-primary">
+              {group.count}
+            </span>
+          </summary>
+          <div className="border-t border-border/70 px-1 pb-1">{group.content}</div>
+        </details>
+      ))}
+    </section>
   );
 }
 
@@ -1479,10 +1529,6 @@ function SettingsView({
   saveCalBookingUrl,
   testimonialsEnabled,
   saveTestimonialsEnabled,
-  websiteThemeMode,
-  saveWebsiteThemeMode,
-  dashboardThemeMode,
-  saveDashboardThemeMode,
   settingsStatus,
 }: {
   calBookingUrl: string;
@@ -1563,43 +1609,6 @@ function SettingsView({
           <p className="rounded-xl bg-muted/60 p-3 text-sm text-muted-foreground">
             Current status: {testimonialsEnabled ? "Visible on homepage" : "Hidden on homepage"}
           </p>
-        </div>
-
-        <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-sm">
-          <div className="mb-5 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <Monitor className="h-5 w-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
-                Admin dashboard
-              </p>
-              <h3 className="font-serif text-2xl text-foreground">Dashboard theme</h3>
-            </div>
-          </div>
-
-          <div className="grid gap-2 rounded-2xl bg-muted/55 p-2 sm:grid-cols-3">
-            {websiteThemeOptions.map((option) => {
-              const Icon = option.icon;
-              const active = dashboardThemeMode === option.value;
-              return (
-                <button
-                  key={option.value}
-                  type="button"
-                  onClick={() => saveDashboardThemeMode(option.value)}
-                  className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition ${
-                    active
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
-                  }`}
-                  aria-pressed={active}
-                >
-                  <Icon className="h-4 w-4" />
-                  {option.label}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {settingsStatus && (
