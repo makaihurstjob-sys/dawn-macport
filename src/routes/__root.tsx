@@ -18,6 +18,7 @@ import {
   watchWebsiteThemeMode,
 } from "@/lib/site-theme";
 import { supabase } from "@/integrations/supabase/client";
+import pipettonScriptFont from "@/assets/fonts/Pipetton Script Regular.otf?url";
 
 function NotFoundComponent() {
   return (
@@ -98,6 +99,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@anewdawncoaching" },
     ],
     links: [
+      {
+        rel: "preload",
+        href: pipettonScriptFont,
+        as: "font",
+        type: "font/otf",
+        crossOrigin: "anonymous",
+      },
       {
         rel: "icon",
         href: "/favicon.ico?v=4",

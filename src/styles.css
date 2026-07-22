@@ -6,13 +6,14 @@
 @font-face {
   font-family: "Pipetton Script";
   src: url("./assets/fonts/Pipetton Script Regular.otf") format("opentype");
-  font-display: swap;
+  font-display: block;
   font-style: normal;
   font-weight: 400;
 }
 
 .brand-script {
   font-family: "Pipetton Script", "Brush Script MT", cursive;
+  font-synthesis: none;
 }
 
 .cursor-dawn-shade {

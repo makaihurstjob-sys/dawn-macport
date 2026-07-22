@@ -66,10 +66,10 @@ function Navbar({ showTestimonials }: { showTestimonials: boolean }) {
           <img
             src={navMarkSrc}
             alt=""
-            className="h-10 w-auto max-w-[72px] shrink-0 object-contain drop-shadow-[0_0_18px_rgba(255,218,154,0.28)] sm:h-11 sm:max-w-[86px]"
+            className="h-10 w-[72px] shrink-0 object-contain drop-shadow-[0_0_18px_rgba(255,218,154,0.28)] sm:h-11 sm:w-[86px]"
             draggable={false}
           />
-          <span className="brand-script hidden text-[1.5rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[1.5rem]">
+          <span className="brand-script hidden w-[160px] whitespace-nowrap text-[1.5rem] font-normal leading-none text-[#fff8ea] drop-shadow-[0_0_18px_rgba(255,248,234,0.18)] sm:block lg:text-[1.5rem]">
             A&apos;New Dawn
           </span>
         </a>
