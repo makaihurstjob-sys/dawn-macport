@@ -708,7 +708,7 @@ function DashboardPage() {
           )}
 
           {activeView === "overview" && (
-            <Overview stats={stats} contacts={contacts} bookings={bookings} intakes={intakes} />
+            <Overview stats={stats} contacts={contacts} bookings={bookings} intakes={intakes} onOpenLeads={() => setActiveView("leads")} />
           )}
           {activeView === "leads" && (
             <LeadsView
@@ -777,28 +777,32 @@ function StatCard({
   label,
   value,
   icon: Icon,
+  onClick,
 }: {
   label: string;
   value: number;
   icon: typeof Home;
+  onClick: () => void;
 }) {
   return (
-    <div className="rounded-2xl border border-border/70 bg-background p-6 shadow-[0_22px_70px_-55px_rgba(75,50,35,0.75)]">
+    <button type="button" onClick={onClick} aria-label={`${label}: ${value}. Open leads`} className="w-full rounded-2xl border border-border/70 bg-background p-6 text-left shadow-[0_22px_70px_-55px_rgba(75,50,35,0.75)] transition hover:border-primary focus-visible:outline-2 focus-visible:outline-primary">
       <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
         <Icon className="h-5 w-5" />
       </div>
       <p className="text-sm font-medium text-muted-foreground">{label}</p>
       <p className="mt-2 text-4xl font-semibold text-foreground">{value}</p>
-    </div>
+    </button>
   );
 }
 
 function Overview({
+  onOpenLeads,
   stats,
   contacts,
   bookings,
   intakes,
 }: {
+  onOpenLeads: () => void;
   stats: {
     newLeads: number;
     contactMessages: number;
@@ -840,15 +844,17 @@ function Overview({
 
   return (
     <div className="space-y-6">
+      <p className="text-sm text-muted-foreground">Total lead submissions: {contacts.length + bookings.length + intakes.length}</p>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="New leads" value={stats.newLeads} icon={UserRoundCheck} />
-        <StatCard label="Contact messages" value={stats.contactMessages} icon={Mail} />
+        <StatCard onClick={onOpenLeads} label="New leads" value={stats.newLeads} icon={UserRoundCheck} />
+        <StatCard onClick={onOpenLeads} label="Contact messages" value={stats.contactMessages} icon={Mail} />
         <StatCard
+          onClick={onOpenLeads}
           label="Booking quiz submissions"
           value={stats.bookingQuizzes}
           icon={CalendarCheck}
         />
-        <StatCard label="Survey entries" value={stats.surveyEntries} icon={ClipboardList} />
+        <StatCard onClick={onOpenLeads} label="Survey entries" value={stats.surveyEntries} icon={ClipboardList} />
       </div>
 
       <section className="rounded-2xl border border-border/70 bg-background shadow-sm">
