@@ -12,7 +12,7 @@ const netlifyPlugin = await import("@netlify/vite-plugin-tanstack-start")
 
 // Redirect TanStack Start's bundled server entry to src/server.ts (our SSR error wrapper).
 export default defineConfig({
-  cloudflare: false,
+  nitro: false,
   plugins: netlifyPlugin,
   tanstackStart: {
     server: { entry: "server" },

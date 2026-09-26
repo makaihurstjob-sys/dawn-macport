@@ -111,7 +111,7 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
-function withTimeout<T>(promise: Promise<T>, message: string) {
+function withTimeout<T>(promise: PromiseLike<T>, message: string) {
   return Promise.race([
     promise,
     new Promise<T>((_, reject) => {
@@ -761,6 +761,10 @@ function DashboardPage() {
               saveCalBookingUrl={saveCalBookingUrl}
               testimonialsEnabled={testimonialsEnabled}
               saveTestimonialsEnabled={saveTestimonialsEnabled}
+              websiteThemeMode={websiteThemeMode}
+              saveWebsiteThemeMode={saveWebsiteThemeMode}
+              dashboardThemeMode={dashboardThemeMode}
+              saveDashboardThemeMode={saveDashboardThemeMode}
               settingsStatus={settingsStatus}
             />
           )}
