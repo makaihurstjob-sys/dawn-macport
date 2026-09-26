@@ -29,6 +29,7 @@ import {
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { siteConfig } from "@/config/site";
+import { downloadCsv } from "@/lib/csv-export";
 import type { Tables } from "@/integrations/supabase/types";
 import {
   deleteBookingQualification,
@@ -1646,7 +1647,24 @@ function SettingsView({
   );
 }
 
-function DeveloperView({ rawData }: { rawData: unknown }) {
+function DeveloperView({ rawData }: { rawData: Record<string, Record<string, unknown>[]> }) {
+  const labels: Record<string, string> = {
+    contacts: "Contacts", bookingQuizSubmissions: "Booking quiz submissions",
+    surveyEntries: "Intake surveys", notes: "Notes", settings: "Settings",
+    courses: "Courses", customers: "Customers", enrollments: "Enrollments",
+    courseProgress: "Course progress", qrLinks: "QR links",
+  };
+  const [dataset, setDataset] = useState("bookingQuizSubmissions");
+  const [exportError, setExportError] = useState("");
+  const rows = rawData[dataset] ?? [];
+  const exportCsv = () => {
+    setExportError("");
+    try {
+      downloadCsv(rows, `anewdawn-${dataset}-${new Date().toISOString().slice(0, 10)}.csv`);
+    } catch {
+      setExportError("CSV export could not start. Please try again.");
+    }
+  };
   return (
     <section>
       <div className="rounded-2xl border border-border/70 bg-[#161821] p-6 text-slate-100 shadow-sm">
@@ -1655,16 +1673,30 @@ function DeveloperView({ rawData }: { rawData: unknown }) {
             <FileJson className="h-5 w-5 text-sky-300" />
             <h3 className="font-mono text-lg">Raw JSON View</h3>
           </div>
+          <div className="flex flex-wrap items-center gap-3">
+          <label className="text-xs">
+            Export dataset
+            <select aria-label="Export dataset" value={dataset} onChange={(event) => {
+              setDataset(event.target.value);
+              setExportError("");
+            }} className="ml-2 rounded-lg border border-slate-600 bg-slate-800 p-2">
+              {Object.keys(rawData).map((key) => <option key={key} value={key}>{labels[key] ?? key} ({rawData[key].length})</option>)}
+            </select>
+          </label>
           <button
             type="button"
-            disabled
-            title="CSV export will be available here soon"
+            disabled={rows.length === 0}
+            onClick={exportCsv}
+            title={rows.length ? "Download the selected dataset as CSV" : "No records in this dataset"}
             className="inline-flex items-center gap-2 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-xs font-semibold text-slate-300 disabled:cursor-not-allowed disabled:opacity-75"
           >
             <Download className="h-3.5 w-3.5" />
             CSV Export
           </button>
+          </div>
         </div>
+        {rows.length === 0 && <p className="mb-3 text-sm">No records in this dataset. Select another dataset to export.</p>}
+        {exportError && <p role="alert" className="mb-3 text-sm text-red-300">{exportError}</p>}
         <pre className="max-h-[620px] overflow-auto rounded-xl bg-black/35 p-4 text-xs leading-6 text-slate-300">
           {JSON.stringify(rawData, null, 2)}
         </pre>
