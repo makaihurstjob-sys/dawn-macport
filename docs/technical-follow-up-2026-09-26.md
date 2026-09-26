@@ -1,5 +1,14 @@
 # Technical follow-up — September 26
 
+## After owner resumed Supabase
+- Supabase management API reports ACTIVE_HEALTHY for the existing project; live browser site_settings requests return HTTP 200.
+- Live schema already includes email and phone on booking_qualifications. No migration is needed for contact capture (supersedes earlier schema uncertainty below).
+- Added required email and optional phone to the local booking contact step; both are included in the existing insert, and email is passed to the scheduler for prefilling.
+- Re-ran TypeScript check: no booking-file errors; the same pre-existing errors below remain. Booking changes are not deployed or end-to-end submission tested yet.
+- Database confirms all five active resources have no download URL: Client Onboarding Worksheet, Discover, Align, Walk, Navigate.
+- cal_booking_url is empty, so the app uses its fallback Cal.com address. Connected calendar and confirmation sender remain unverified.
+- Successful login, booking inserts and authenticated CRM testing are still outstanding; public login rendering alone does not verify these.
+
 ## Completed locally
 - Admin overview count cards are now keyboard-accessible buttons opening the Leads view.
 - Overview reports total lead submissions across contact messages, booking quizzes and intake surveys. This is a submission count, not deduplicated people.

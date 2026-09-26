@@ -42,6 +42,8 @@ const questions: Array<{
 function BookingPage() {
   const [step, setStep] = useState(0);
   const [clientName, setClientName] = useState("");
+  const [clientEmail, setClientEmail] = useState("");
+  const [clientPhone, setClientPhone] = useState("");
   const [bookingUrl, setBookingUrl] = useState(siteConfig.bookingUrl);
   const [answers, setAnswers] = useState<Record<AnswerKey, string>>({
     seeking: "",
@@ -65,11 +67,12 @@ function BookingPage() {
       const url = new URL(bookingUrl);
       url.searchParams.set("embed", "true");
       if (clientName.trim()) url.searchParams.set("name", clientName.trim());
+      if (clientEmail.trim()) url.searchParams.set("email", clientEmail.trim());
       return url.toString();
     } catch {
       return bookingUrl;
     }
-  }, [bookingUrl, clientName]);
+  }, [bookingUrl, clientName, clientEmail]);
 
   useEffect(() => {
     const loadBookingUrl = async () => {
@@ -103,11 +106,11 @@ function BookingPage() {
     event.preventDefault();
 
     const trimmedName = clientName.trim();
-    if (!trimmedName) return;
+    if (!trimmedName || !clientEmail.trim() || isSubmitting) return;
 
     setIsSubmitting(true);
     const { error } = await Promise.race([
-      supabase.from("booking_qualifications").insert([{ ...answers, client_name: trimmedName }]),
+      supabase.from("booking_qualifications").insert([{ ...answers, client_name: trimmedName, email: clientEmail.trim(), phone: clientPhone.trim() || null }]),
       new Promise<{ error: Error }>((resolve) => {
         window.setTimeout(() => resolve({ error: new Error("Booking save timed out") }), 3500);
       }),
@@ -222,10 +225,10 @@ function BookingPage() {
                     transition={{ duration: 0.32, ease: "easeOut" }}
                   >
                     <h2 className="font-serif text-3xl leading-tight text-foreground">
-                      What name should we attach to this request?
+                      How can we reach you?
                     </h2>
                     <p className="mt-3 leading-7 text-muted-foreground">
-                      This helps the coach recognize your booking quiz inside the dashboard.
+                      Share your contact details, then choose a time in the scheduler.
                     </p>
                     <label className="mt-8 block text-sm font-semibold text-foreground">
                       Name
@@ -237,6 +240,14 @@ function BookingPage() {
                         className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/10"
                         placeholder="Your name"
                       />
+                    </label>
+                    <label className="mt-5 block text-sm font-semibold text-foreground">
+                      Email
+                      <input type="email" required autoComplete="email" value={clientEmail} onChange={(event) => setClientEmail(event.target.value)} className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none focus:border-primary" placeholder="you@example.com" />
+                    </label>
+                    <label className="mt-5 block text-sm font-semibold text-foreground">
+                      Phone (optional)
+                      <input type="tel" autoComplete="tel" value={clientPhone} onChange={(event) => setClientPhone(event.target.value)} className="mt-2 w-full rounded-xl border border-border bg-white/70 px-4 py-3 text-foreground outline-none focus:border-primary" placeholder="Your phone number" />
                     </label>
                     {submitError && (
                       <p className="mt-5 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
